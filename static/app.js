@@ -15,172 +15,824 @@ const CURRENCIES = [
 // 100% Offline Database (Used when backend API is unreachable due to firewalls or server shutdown)
 const OFFLINE_DB = {
     "EUR": {
-        name: "유로 (EUR/USD)", symbol: "EUR/USD", format: "{:.4f}",
-        records: [
-            { label: "2026년 01월 평균", date: "2026-01-01", type: "monthly_avg", rate: 1.0725 },
-            { label: "2026년 02월 평균", date: "2026-02-01", type: "monthly_avg", rate: 1.0810 },
-            { label: "2026년 03월 평균", date: "2026-03-01", type: "monthly_avg", rate: 1.0895 },
-            { label: "2026년 04월 평균", date: "2026-04-01", type: "monthly_avg", rate: 1.0712 },
-            { label: "2026년 05월 평균", date: "2026-05-01", type: "monthly_avg", rate: 1.0825 },
-            { label: "2026-06-01", date: "2026-06-01", type: "daily", rate: 1.0832 },
-            { label: "2026-06-02", date: "2026-06-02", type: "daily", rate: 1.0845 },
-            { label: "2026-06-03", date: "2026-06-03", type: "daily", rate: 1.0821 },
-            { label: "2026-06-04", date: "2026-06-04", type: "daily", rate: 1.0855 },
-            { label: "2026-06-05", date: "2026-06-05", type: "daily", rate: 1.0862 },
-            { label: "2026-06-08", date: "2026-06-08", type: "daily", rate: 1.0841 },
-            { label: "2026-06-09", date: "2026-06-09", type: "daily", rate: 1.0835 },
-            { label: "2026-06-10", date: "2026-06-10", type: "daily", rate: 1.0818 },
-            { label: "2026-06-11", date: "2026-06-11", type: "daily", rate: 1.0829 },
-            { label: "2026-06-12", date: "2026-06-12", type: "daily", rate: 1.0850 }
+        "name": "유로 (EUR/USD)",
+        "symbol": "EUR/USD",
+        "format": "{:.4f}",
+        "records": [
+            {
+                "label": "2026년 01월 평균",
+                "date": "2026-01-01",
+                "type": "monthly_avg",
+                "rate": 1.1738
+            },
+            {
+                "label": "2026년 02월 평균",
+                "date": "2026-02-01",
+                "type": "monthly_avg",
+                "rate": 1.1828
+            },
+            {
+                "label": "2026년 03월 평균",
+                "date": "2026-03-01",
+                "type": "monthly_avg",
+                "rate": 1.1567
+            },
+            {
+                "label": "2026년 04월 평균",
+                "date": "2026-04-01",
+                "type": "monthly_avg",
+                "rate": 1.1687
+            },
+            {
+                "label": "2026년 05월 평균",
+                "date": "2026-05-01",
+                "type": "monthly_avg",
+                "rate": 1.1682
+            },
+            {
+                "label": "2026-06-01",
+                "date": "2026-06-01",
+                "type": "daily",
+                "rate": 1.1649
+            },
+            {
+                "label": "2026-06-02",
+                "date": "2026-06-02",
+                "type": "daily",
+                "rate": 1.1635
+            },
+            {
+                "label": "2026-06-03",
+                "date": "2026-06-03",
+                "type": "daily",
+                "rate": 1.1622
+            },
+            {
+                "label": "2026-06-04",
+                "date": "2026-06-04",
+                "type": "daily",
+                "rate": 1.1609
+            },
+            {
+                "label": "2026-06-05",
+                "date": "2026-06-05",
+                "type": "daily",
+                "rate": 1.1613
+            },
+            {
+                "label": "2026-06-08",
+                "date": "2026-06-08",
+                "type": "daily",
+                "rate": 1.1523
+            },
+            {
+                "label": "2026-06-09",
+                "date": "2026-06-09",
+                "type": "daily",
+                "rate": 1.1528
+            },
+            {
+                "label": "2026-06-10",
+                "date": "2026-06-10",
+                "type": "daily",
+                "rate": 1.1535
+            },
+            {
+                "label": "2026-06-11",
+                "date": "2026-06-11",
+                "type": "daily",
+                "rate": 1.1536
+            },
+            {
+                "label": "2026-06-12",
+                "date": "2026-06-12",
+                "type": "daily",
+                "rate": 1.1573
+            }
         ],
-        cumulative_average: 1.0839
+        "cumulative_average": 1.1582
     },
     "GBP": {
-        name: "영국 파운드 (GBP/USD)", symbol: "GBP/USD", format: "{:.4f}",
-        records: [
-            { label: "2026년 01월 평균", date: "2026-01-01", type: "monthly_avg", rate: 1.2580 },
-            { label: "2026년 02월 평균", date: "2026-02-01", type: "monthly_avg", rate: 1.2642 },
-            { label: "2026년 03월 평균", date: "2026-03-01", type: "monthly_avg", rate: 1.2710 },
-            { label: "2026년 04월 평균", date: "2026-04-01", type: "monthly_avg", rate: 1.2590 },
-            { label: "2026년 05월 평균", date: "2026-05-01", type: "monthly_avg", rate: 1.2685 },
-            { label: "2026-06-01", date: "2026-06-01", type: "daily", rate: 1.2692 },
-            { label: "2026-06-02", date: "2026-06-02", type: "daily", rate: 1.2715 },
-            { label: "2026-06-03", date: "2026-06-03", type: "daily", rate: 1.2681 },
-            { label: "2026-06-04", date: "2026-06-04", type: "daily", rate: 1.2725 },
-            { label: "2026-06-05", date: "2026-06-05", type: "daily", rate: 1.2742 },
-            { label: "2026-06-08", date: "2026-06-08", type: "daily", rate: 1.2711 },
-            { label: "2026-06-09", date: "2026-06-09", type: "daily", rate: 1.2705 },
-            { label: "2026-06-10", date: "2026-06-10", type: "daily", rate: 1.2688 },
-            { label: "2026-06-11", date: "2026-06-11", type: "daily", rate: 1.2699 },
-            { label: "2026-06-12", date: "2026-06-12", type: "daily", rate: 1.2720 }
+        "name": "영국 파운드 (GBP/USD)",
+        "symbol": "GBP/USD",
+        "format": "{:.4f}",
+        "records": [
+            {
+                "label": "2026년 01월 평균",
+                "date": "2026-01-01",
+                "type": "monthly_avg",
+                "rate": 1.3521
+            },
+            {
+                "label": "2026년 02월 평균",
+                "date": "2026-02-01",
+                "type": "monthly_avg",
+                "rate": 1.3588
+            },
+            {
+                "label": "2026년 03월 평균",
+                "date": "2026-03-01",
+                "type": "monthly_avg",
+                "rate": 1.3349
+            },
+            {
+                "label": "2026년 04월 평균",
+                "date": "2026-04-01",
+                "type": "monthly_avg",
+                "rate": 1.3435
+            },
+            {
+                "label": "2026년 05월 평균",
+                "date": "2026-05-01",
+                "type": "monthly_avg",
+                "rate": 1.3494
+            },
+            {
+                "label": "2026-06-01",
+                "date": "2026-06-01",
+                "type": "daily",
+                "rate": 1.3452
+            },
+            {
+                "label": "2026-06-02",
+                "date": "2026-06-02",
+                "type": "daily",
+                "rate": 1.346
+            },
+            {
+                "label": "2026-06-03",
+                "date": "2026-06-03",
+                "type": "daily",
+                "rate": 1.3454
+            },
+            {
+                "label": "2026-06-04",
+                "date": "2026-06-04",
+                "type": "daily",
+                "rate": 1.3427
+            },
+            {
+                "label": "2026-06-05",
+                "date": "2026-06-05",
+                "type": "daily",
+                "rate": 1.3427
+            },
+            {
+                "label": "2026-06-08",
+                "date": "2026-06-08",
+                "type": "daily",
+                "rate": 1.3336
+            },
+            {
+                "label": "2026-06-09",
+                "date": "2026-06-09",
+                "type": "daily",
+                "rate": 1.3333
+            },
+            {
+                "label": "2026-06-10",
+                "date": "2026-06-10",
+                "type": "daily",
+                "rate": 1.3372
+            },
+            {
+                "label": "2026-06-11",
+                "date": "2026-06-11",
+                "type": "daily",
+                "rate": 1.3362
+            },
+            {
+                "label": "2026-06-12",
+                "date": "2026-06-12",
+                "type": "daily",
+                "rate": 1.3414
+            },
+            {
+                "label": "2026-06-14",
+                "date": "2026-06-14",
+                "type": "daily",
+                "rate": 1.3408
+            }
         ],
-        cumulative_average: 1.2708
+        "cumulative_average": 1.3404
     },
     "CZK": {
-        name: "체코 코루나 (USD/CZK)", symbol: "USD/CZK", format: "{:.4f}",
-        records: [
-            { label: "2026년 01월 평균", date: "2026-01-01", type: "monthly_avg", rate: 22.9500 },
-            { label: "2026년 02월 평균", date: "2026-02-01", type: "monthly_avg", rate: 23.1500 },
-            { label: "2026년 03월 평균", date: "2026-03-01", type: "monthly_avg", rate: 23.0800 },
-            { label: "2026년 04월 평균", date: "2026-04-01", type: "monthly_avg", rate: 23.5500 },
-            { label: "2026년 05월 평균", date: "2026-05-01", type: "monthly_avg", rate: 23.3800 },
-            { label: "2026-06-01", date: "2026-06-01", type: "daily", rate: 23.2100 },
-            { label: "2026-06-02", date: "2026-06-02", type: "daily", rate: 23.1500 },
-            { label: "2026-06-03", date: "2026-06-03", type: "daily", rate: 23.2800 },
-            { label: "2026-06-04", date: "2026-06-04", type: "daily", rate: 23.1000 },
-            { label: "2026-06-05", date: "2026-06-05", type: "daily", rate: 23.0500 },
-            { label: "2026-06-08", date: "2026-06-08", type: "daily", rate: 23.2200 },
-            { label: "2026-06-09", date: "2026-06-09", type: "daily", rate: 23.2800 },
-            { label: "2026-06-10", date: "2026-06-10", type: "daily", rate: 23.3500 },
-            { label: "2026-06-11", date: "2026-06-11", type: "daily", rate: 23.3000 },
-            { label: "2026-06-12", date: "2026-06-12", type: "daily", rate: 23.2000 }
+        "name": "체코 코루나 (USD/CZK)",
+        "symbol": "USD/CZK",
+        "format": "{:.4f}",
+        "records": [
+            {
+                "label": "2026년 01월 평균",
+                "date": "2026-01-01",
+                "type": "monthly_avg",
+                "rate": 20.6558
+            },
+            {
+                "label": "2026년 02월 평균",
+                "date": "2026-02-01",
+                "type": "monthly_avg",
+                "rate": 20.495
+            },
+            {
+                "label": "2026년 03월 평균",
+                "date": "2026-03-01",
+                "type": "monthly_avg",
+                "rate": 21.0962
+            },
+            {
+                "label": "2026년 04월 평균",
+                "date": "2026-04-01",
+                "type": "monthly_avg",
+                "rate": 20.8537
+            },
+            {
+                "label": "2026년 05월 평균",
+                "date": "2026-05-01",
+                "type": "monthly_avg",
+                "rate": 20.8043
+            },
+            {
+                "label": "2026-06-01",
+                "date": "2026-06-01",
+                "type": "daily",
+                "rate": 20.822
+            },
+            {
+                "label": "2026-06-02",
+                "date": "2026-06-02",
+                "type": "daily",
+                "rate": 20.8552
+            },
+            {
+                "label": "2026-06-03",
+                "date": "2026-06-03",
+                "type": "daily",
+                "rate": 20.8085
+            },
+            {
+                "label": "2026-06-04",
+                "date": "2026-06-04",
+                "type": "daily",
+                "rate": 20.8465
+            },
+            {
+                "label": "2026-06-05",
+                "date": "2026-06-05",
+                "type": "daily",
+                "rate": 20.8083
+            },
+            {
+                "label": "2026-06-08",
+                "date": "2026-06-08",
+                "type": "daily",
+                "rate": 20.9727
+            },
+            {
+                "label": "2026-06-09",
+                "date": "2026-06-09",
+                "type": "daily",
+                "rate": 20.9633
+            },
+            {
+                "label": "2026-06-10",
+                "date": "2026-06-10",
+                "type": "daily",
+                "rate": 20.9281
+            },
+            {
+                "label": "2026-06-11",
+                "date": "2026-06-11",
+                "type": "daily",
+                "rate": 20.9614
+            },
+            {
+                "label": "2026-06-12",
+                "date": "2026-06-12",
+                "type": "daily",
+                "rate": 20.8674
+            },
+            {
+                "label": "2026-06-13",
+                "date": "2026-06-13",
+                "type": "daily",
+                "rate": 20.887
+            }
         ],
-        cumulative_average: 23.2140
+        "cumulative_average": 20.8837
     },
     "HUF": {
-        name: "헝가리 포린트 (USD/HUF)", symbol: "USD/HUF", format: "{:.2f}",
-        records: [
-            { label: "2026년 01월 평균", date: "2026-01-01", type: "monthly_avg", rate: 352.40 },
-            { label: "2026년 02월 평균", date: "2026-02-01", type: "monthly_avg", rate: 360.20 },
-            { label: "2026년 03월 평균", date: "2026-03-01", type: "monthly_avg", rate: 363.80 },
-            { label: "2026년 04월 평균", date: "2026-04-01", type: "monthly_avg", rate: 367.50 },
-            { label: "2026년 05월 평균", date: "2026-05-01", type: "monthly_avg", rate: 365.10 },
-            { label: "2026-06-01", date: "2026-06-01", type: "daily", rate: 364.20 },
-            { label: "2026-06-02", date: "2026-06-02", type: "daily", rate: 363.50 },
-            { label: "2026-06-03", date: "2026-06-03", type: "daily", rate: 365.80 },
-            { label: "2026-06-04", date: "2026-06-04", type: "daily", rate: 362.10 },
-            { label: "2026-06-05", date: "2026-06-05", type: "daily", rate: 361.50 },
-            { label: "2026-06-08", date: "2026-06-08", type: "daily", rate: 363.90 },
-            { label: "2026-06-09", date: "2026-06-09", type: "daily", rate: 364.80 },
-            { label: "2026-06-10", date: "2026-06-10", type: "daily", rate: 366.50 },
-            { label: "2026-06-11", date: "2026-06-11", type: "daily", rate: 365.20 },
-            { label: "2026-06-12", date: "2026-06-12", type: "daily", rate: 363.80 }
+        "name": "헝가리 포린트 (USD/HUF)",
+        "symbol": "USD/HUF",
+        "format": "{:.2f}",
+        "records": [
+            {
+                "label": "2026년 01월 평균",
+                "date": "2026-01-01",
+                "type": "monthly_avg",
+                "rate": 326.85
+            },
+            {
+                "label": "2026년 02월 평균",
+                "date": "2026-02-01",
+                "type": "monthly_avg",
+                "rate": 319.84
+            },
+            {
+                "label": "2026년 03월 평균",
+                "date": "2026-03-01",
+                "type": "monthly_avg",
+                "rate": 335.17
+            },
+            {
+                "label": "2026년 04월 평균",
+                "date": "2026-04-01",
+                "type": "monthly_avg",
+                "rate": 316.36
+            },
+            {
+                "label": "2026년 05월 평균",
+                "date": "2026-05-01",
+                "type": "monthly_avg",
+                "rate": 306.39
+            },
+            {
+                "label": "2026-06-01",
+                "date": "2026-06-01",
+                "type": "daily",
+                "rate": 303.08
+            },
+            {
+                "label": "2026-06-02",
+                "date": "2026-06-02",
+                "type": "daily",
+                "rate": 304.11
+            },
+            {
+                "label": "2026-06-03",
+                "date": "2026-06-03",
+                "type": "daily",
+                "rate": 304.62
+            },
+            {
+                "label": "2026-06-04",
+                "date": "2026-06-04",
+                "type": "daily",
+                "rate": 306.07
+            },
+            {
+                "label": "2026-06-05",
+                "date": "2026-06-05",
+                "type": "daily",
+                "rate": 304.19
+            },
+            {
+                "label": "2026-06-08",
+                "date": "2026-06-08",
+                "type": "daily",
+                "rate": 308.26
+            },
+            {
+                "label": "2026-06-09",
+                "date": "2026-06-09",
+                "type": "daily",
+                "rate": 308.11
+            },
+            {
+                "label": "2026-06-10",
+                "date": "2026-06-10",
+                "type": "daily",
+                "rate": 308.3
+            },
+            {
+                "label": "2026-06-11",
+                "date": "2026-06-11",
+                "type": "daily",
+                "rate": 308.15
+            },
+            {
+                "label": "2026-06-12",
+                "date": "2026-06-12",
+                "type": "daily",
+                "rate": 305.04
+            },
+            {
+                "label": "2026-06-13",
+                "date": "2026-06-13",
+                "type": "daily",
+                "rate": 303.79
+            }
         ],
-        cumulative_average: 364.13
+        "cumulative_average": 305.79
     },
     "PLN": {
-        name: "폴란드 즈로티 (USD/PLN)", symbol: "USD/PLN", format: "{:.4f}",
-        records: [
-            { label: "2026년 01월 평균", date: "2026-01-01", type: "monthly_avg", rate: 3.9900 },
-            { label: "2026년 02월 평균", date: "2026-02-01", type: "monthly_avg", rate: 4.0300 },
-            { label: "2026년 03월 평균", date: "2026-03-01", type: "monthly_avg", rate: 3.9800 },
-            { label: "2026년 04월 평균", date: "2026-04-01", type: "monthly_avg", rate: 4.0700 },
-            { label: "2026년 05월 평균", date: "2026-05-01", type: "monthly_avg", rate: 4.0200 },
-            { label: "2026-06-01", date: "2026-06-01", type: "daily", rate: 3.9600 },
-            { label: "2026-06-02", date: "2026-06-02", type: "daily", rate: 3.9400 },
-            { label: "2026-06-03", date: "2026-06-03", type: "daily", rate: 3.9700 },
-            { label: "2026-06-04", date: "2026-06-04", type: "daily", rate: 3.9300 },
-            { label: "2026-06-05", date: "2026-06-05", type: "daily", rate: 3.9200 },
-            { label: "2026-06-08", date: "2026-06-08", type: "daily", rate: 3.9500 },
-            { label: "2026-06-09", date: "2026-06-09", type: "daily", rate: 3.9700 },
-            { label: "2026-06-10", date: "2026-06-10", type: "daily", rate: 3.9900 },
-            { label: "2026-06-11", date: "2026-06-11", type: "daily", rate: 3.9800 },
-            { label: "2026-06-12", date: "2026-06-12", type: "daily", rate: 3.9500 }
+        "name": "폴란드 즈로티 (USD/PLN)",
+        "symbol": "USD/PLN",
+        "format": "{:.4f}",
+        "records": [
+            {
+                "label": "2026년 01월 평균",
+                "date": "2026-01-01",
+                "type": "monthly_avg",
+                "rate": 3.5865
+            },
+            {
+                "label": "2026년 02월 평균",
+                "date": "2026-02-01",
+                "type": "monthly_avg",
+                "rate": 3.564
+            },
+            {
+                "label": "2026년 03월 평균",
+                "date": "2026-03-01",
+                "type": "monthly_avg",
+                "rate": 3.6868
+            },
+            {
+                "label": "2026년 04월 평균",
+                "date": "2026-04-01",
+                "type": "monthly_avg",
+                "rate": 3.6371
+            },
+            {
+                "label": "2026년 05월 평균",
+                "date": "2026-05-01",
+                "type": "monthly_avg",
+                "rate": 3.6294
+            },
+            {
+                "label": "2026-06-01",
+                "date": "2026-06-01",
+                "type": "daily",
+                "rate": 3.6307
+            },
+            {
+                "label": "2026-06-02",
+                "date": "2026-06-02",
+                "type": "daily",
+                "rate": 3.6386
+            },
+            {
+                "label": "2026-06-03",
+                "date": "2026-06-03",
+                "type": "daily",
+                "rate": 3.6436
+            },
+            {
+                "label": "2026-06-04",
+                "date": "2026-06-04",
+                "type": "daily",
+                "rate": 3.6527
+            },
+            {
+                "label": "2026-06-05",
+                "date": "2026-06-05",
+                "type": "daily",
+                "rate": 3.6462
+            },
+            {
+                "label": "2026-06-08",
+                "date": "2026-06-08",
+                "type": "daily",
+                "rate": 3.6816
+            },
+            {
+                "label": "2026-06-09",
+                "date": "2026-06-09",
+                "type": "daily",
+                "rate": 3.676
+            },
+            {
+                "label": "2026-06-10",
+                "date": "2026-06-10",
+                "type": "daily",
+                "rate": 3.6741
+            },
+            {
+                "label": "2026-06-11",
+                "date": "2026-06-11",
+                "type": "daily",
+                "rate": 3.6844
+            },
+            {
+                "label": "2026-06-12",
+                "date": "2026-06-12",
+                "type": "daily",
+                "rate": 3.6677
+            },
+            {
+                "label": "2026-06-13",
+                "date": "2026-06-13",
+                "type": "daily",
+                "rate": 3.672
+            }
         ],
-        cumulative_average: 3.9560
+        "cumulative_average": 3.6607
     },
     "RON": {
-        name: "루마니아 레우 (USD/RON)", symbol: "USD/RON", format: "{:.4f}",
-        records: [
-            { label: "2026년 01월 평균", date: "2026-01-01", type: "monthly_avg", rate: 4.5900 },
-            { label: "2026년 02월 평균", date: "2026-02-01", type: "monthly_avg", rate: 4.6200 },
-            { label: "2026년 03월 평균", date: "2026-03-01", type: "monthly_avg", rate: 4.6000 },
-            { label: "2026년 04월 평균", date: "2026-04-01", type: "monthly_avg", rate: 4.6500 },
-            { label: "2026년 05월 평균", date: "2026-05-01", type: "monthly_avg", rate: 4.6300 },
-            { label: "2026-06-01", date: "2026-06-01", type: "daily", rate: 4.6100 },
-            { label: "2026-06-02", date: "2026-06-02", type: "daily", rate: 4.6000 },
-            { label: "2026-06-03", date: "2026-06-03", type: "daily", rate: 4.6200 },
-            { label: "2026-06-04", date: "2026-06-04", type: "daily", rate: 4.5900 },
-            { label: "2026-06-05", date: "2026-06-05", type: "daily", rate: 4.5800 },
-            { label: "2026-06-08", date: "2026-06-08", type: "daily", rate: 4.6100 },
-            { label: "2026-06-09", date: "2026-06-09", type: "daily", rate: 4.6200 },
-            { label: "2026-06-10", date: "2026-06-10", type: "daily", rate: 4.6300 },
-            { label: "2026-06-11", date: "2026-06-11", type: "daily", rate: 4.6200 },
-            { label: "2026-06-12", date: "2026-06-12", type: "daily", rate: 4.6000 }
+        "name": "루마니아 레우 (USD/RON)",
+        "symbol": "USD/RON",
+        "format": "{:.4f}",
+        "records": [
+            {
+                "label": "2026년 01월 평균",
+                "date": "2026-01-01",
+                "type": "monthly_avg",
+                "rate": 4.3344
+            },
+            {
+                "label": "2026년 02월 평균",
+                "date": "2026-02-01",
+                "type": "monthly_avg",
+                "rate": 4.303
+            },
+            {
+                "label": "2026년 03월 평균",
+                "date": "2026-03-01",
+                "type": "monthly_avg",
+                "rate": 4.3973
+            },
+            {
+                "label": "2026년 04월 평균",
+                "date": "2026-04-01",
+                "type": "monthly_avg",
+                "rate": 4.3542
+            },
+            {
+                "label": "2026년 05월 평균",
+                "date": "2026-05-01",
+                "type": "monthly_avg",
+                "rate": 4.4684
+            },
+            {
+                "label": "2026-06-01",
+                "date": "2026-06-01",
+                "type": "daily",
+                "rate": 4.5032
+            },
+            {
+                "label": "2026-06-02",
+                "date": "2026-06-02",
+                "type": "daily",
+                "rate": 4.5036
+            },
+            {
+                "label": "2026-06-03",
+                "date": "2026-06-03",
+                "type": "daily",
+                "rate": 4.5168
+            },
+            {
+                "label": "2026-06-04",
+                "date": "2026-06-04",
+                "type": "daily",
+                "rate": 4.5232
+            },
+            {
+                "label": "2026-06-05",
+                "date": "2026-06-05",
+                "type": "daily",
+                "rate": 4.5218
+            },
+            {
+                "label": "2026-06-08",
+                "date": "2026-06-08",
+                "type": "daily",
+                "rate": 4.5483
+            },
+            {
+                "label": "2026-06-09",
+                "date": "2026-06-09",
+                "type": "daily",
+                "rate": 4.5422
+            },
+            {
+                "label": "2026-06-10",
+                "date": "2026-06-10",
+                "type": "daily",
+                "rate": 4.5359
+            },
+            {
+                "label": "2026-06-11",
+                "date": "2026-06-11",
+                "type": "daily",
+                "rate": 4.5336
+            },
+            {
+                "label": "2026-06-12",
+                "date": "2026-06-12",
+                "type": "daily",
+                "rate": 4.5182
+            },
+            {
+                "label": "2026-06-13",
+                "date": "2026-06-13",
+                "type": "daily",
+                "rate": 4.5256
+            }
         ],
-        cumulative_average: 4.6050
+        "cumulative_average": 4.5248
     },
     "CHF": {
-        name: "스위스 프랑 (USD/CHF)", symbol: "USD/CHF", format: "{:.4f}",
-        records: [
-            { label: "2026년 01월 평균", date: "2026-01-01", type: "monthly_avg", rate: 0.8650 },
-            { label: "2026년 02월 평균", date: "2026-02-01", type: "monthly_avg", rate: 0.8820 },
-            { label: "2026년 03월 평균", date: "2026-03-01", type: "monthly_avg", rate: 0.8890 },
-            { label: "2026년 04월 평균", date: "2026-04-01", type: "monthly_avg", rate: 0.9090 },
-            { label: "2026년 05월 평균", date: "2026-05-01", type: "monthly_avg", rate: 0.9040 },
-            { label: "2026-06-01", date: "2026-06-01", type: "daily", rate: 0.8960 },
-            { label: "2026-06-02", date: "2026-06-02", type: "daily", rate: 0.8930 },
-            { label: "2026-06-03", date: "2026-06-03", type: "daily", rate: 0.8980 },
-            { label: "2026-06-04", date: "2026-06-04", type: "daily", rate: 0.8910 },
-            { label: "2026-06-05", date: "2026-06-05", type: "daily", rate: 0.8890 },
-            { label: "2026-06-08", date: "2026-06-08", type: "daily", rate: 0.8940 },
-            { label: "2026-06-09", date: "2026-06-09", type: "daily", rate: 0.8960 },
-            { label: "2026-06-10", date: "2026-06-10", type: "daily", rate: 0.8990 },
-            { label: "2026-06-11", date: "2026-06-11", type: "daily", rate: 0.8970 },
-            { label: "2026-06-12", date: "2026-06-12", type: "daily", rate: 0.8920 }
+        "name": "스위스 프랑 (USD/CHF)",
+        "symbol": "USD/CHF",
+        "format": "{:.4f}",
+        "records": [
+            {
+                "label": "2026년 01월 평균",
+                "date": "2026-01-01",
+                "type": "monthly_avg",
+                "rate": 0.7901
+            },
+            {
+                "label": "2026년 02월 평균",
+                "date": "2026-02-01",
+                "type": "monthly_avg",
+                "rate": 0.7728
+            },
+            {
+                "label": "2026년 03월 평균",
+                "date": "2026-03-01",
+                "type": "monthly_avg",
+                "rate": 0.7858
+            },
+            {
+                "label": "2026년 04월 평균",
+                "date": "2026-04-01",
+                "type": "monthly_avg",
+                "rate": 0.7886
+            },
+            {
+                "label": "2026년 05월 평균",
+                "date": "2026-05-01",
+                "type": "monthly_avg",
+                "rate": 0.7831
+            },
+            {
+                "label": "2026-06-01",
+                "date": "2026-06-01",
+                "type": "daily",
+                "rate": 0.7819
+            },
+            {
+                "label": "2026-06-02",
+                "date": "2026-06-02",
+                "type": "daily",
+                "rate": 0.7861
+            },
+            {
+                "label": "2026-06-03",
+                "date": "2026-06-03",
+                "type": "daily",
+                "rate": 0.7883
+            },
+            {
+                "label": "2026-06-04",
+                "date": "2026-06-04",
+                "type": "daily",
+                "rate": 0.791
+            },
+            {
+                "label": "2026-06-05",
+                "date": "2026-06-05",
+                "type": "daily",
+                "rate": 0.7889
+            },
+            {
+                "label": "2026-06-08",
+                "date": "2026-06-08",
+                "type": "daily",
+                "rate": 0.7964
+            },
+            {
+                "label": "2026-06-09",
+                "date": "2026-06-09",
+                "type": "daily",
+                "rate": 0.7982
+            },
+            {
+                "label": "2026-06-10",
+                "date": "2026-06-10",
+                "type": "daily",
+                "rate": 0.7993
+            },
+            {
+                "label": "2026-06-11",
+                "date": "2026-06-11",
+                "type": "daily",
+                "rate": 0.8
+            },
+            {
+                "label": "2026-06-12",
+                "date": "2026-06-12",
+                "type": "daily",
+                "rate": 0.7951
+            },
+            {
+                "label": "2026-06-14",
+                "date": "2026-06-14",
+                "type": "daily",
+                "rate": 0.7964
+            }
         ],
-        cumulative_average: 0.8945
+        "cumulative_average": 0.7929
     },
     "KRW": {
-        name: "대한민국 원 (USD/KRW)", symbol: "USD/KRW", format: "{:.2f}",
-        records: [
-            { label: "2026년 01월 평균", date: "2026-01-01", type: "monthly_avg", rate: 1325.50 },
-            { label: "2026년 02월 평균", date: "2026-02-01", type: "monthly_avg", rate: 1338.20 },
-            { label: "2026년 03월 평균", date: "2026-03-01", type: "monthly_avg", rate: 1345.80 },
-            { label: "2026년 04월 평균", date: "2026-04-01", type: "monthly_avg", rate: 1368.10 },
-            { label: "2026년 05월 평균", date: "2026-05-01", type: "monthly_avg", rate: 1382.40 },
-            { label: "2026-06-01", date: "2026-06-01", type: "daily", rate: 1392.50 },
-            { label: "2026-06-02", date: "2026-06-02", type: "daily", rate: 1388.20 },
-            { label: "2026-06-03", date: "2026-06-03", type: "daily", rate: 1395.40 },
-            { label: "2026-06-04", date: "2026-06-04", type: "daily", rate: 1385.10 },
-            { label: "2026-06-05", date: "2026-06-05", type: "daily", rate: 1381.80 },
-            { label: "2026-06-08", date: "2026-06-08", type: "daily", rate: 1390.20 },
-            { label: "2026-06-09", date: "2026-06-09", type: "daily", rate: 1394.80 },
-            { label: "2026-06-10", date: "2026-06-10", type: "daily", rate: 1398.50 },
-            { label: "2026-06-11", date: "2026-06-11", type: "daily", rate: 1393.20 },
-            { label: "2026-06-12", date: "2026-06-12", type: "daily", rate: 1386.40 }
+        "name": "대한민국 원 (USD/KRW)",
+        "symbol": "USD/KRW",
+        "format": "{:.2f}",
+        "records": [
+            {
+                "label": "2026년 01월 평균",
+                "date": "2026-01-01",
+                "type": "monthly_avg",
+                "rate": 1453.38
+            },
+            {
+                "label": "2026년 02월 평균",
+                "date": "2026-02-01",
+                "type": "monthly_avg",
+                "rate": 1446.63
+            },
+            {
+                "label": "2026년 03월 평균",
+                "date": "2026-03-01",
+                "type": "monthly_avg",
+                "rate": 1485.05
+            },
+            {
+                "label": "2026년 04월 평균",
+                "date": "2026-04-01",
+                "type": "monthly_avg",
+                "rate": 1484.43
+            },
+            {
+                "label": "2026년 05월 평균",
+                "date": "2026-05-01",
+                "type": "monthly_avg",
+                "rate": 1487.58
+            },
+            {
+                "label": "2026-06-01",
+                "date": "2026-06-01",
+                "type": "daily",
+                "rate": 1506.84
+            },
+            {
+                "label": "2026-06-02",
+                "date": "2026-06-02",
+                "type": "daily",
+                "rate": 1511.27
+            },
+            {
+                "label": "2026-06-03",
+                "date": "2026-06-03",
+                "type": "daily",
+                "rate": 1516.6
+            },
+            {
+                "label": "2026-06-04",
+                "date": "2026-06-04",
+                "type": "daily",
+                "rate": 1530.11
+            },
+            {
+                "label": "2026-06-05",
+                "date": "2026-06-05",
+                "type": "daily",
+                "rate": 1533.07
+            },
+            {
+                "label": "2026-06-08",
+                "date": "2026-06-08",
+                "type": "daily",
+                "rate": 1554.48
+            },
+            {
+                "label": "2026-06-09",
+                "date": "2026-06-09",
+                "type": "daily",
+                "rate": 1528.88
+            },
+            {
+                "label": "2026-06-10",
+                "date": "2026-06-10",
+                "type": "daily",
+                "rate": 1525.81
+            },
+            {
+                "label": "2026-06-11",
+                "date": "2026-06-11",
+                "type": "daily",
+                "rate": 1525.05
+            },
+            {
+                "label": "2026-06-12",
+                "date": "2026-06-12",
+                "type": "daily",
+                "rate": 1517.89
+            }
         ],
-        cumulative_average: 1390.61
+        "cumulative_average": 1525.0
     }
 };
 
