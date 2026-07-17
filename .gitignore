@@ -1,0 +1,14 @@
+# Python bytecode
+__pycache__/
+*.pyc
+
+# Local environments
+.env
+.venv/
+env/
+venv/
+
+# Firebase executables and logs
+firebase.exe
+firepit-log.txt
+.firebase/

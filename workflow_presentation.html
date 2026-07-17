@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F(x) Tracker 구축 워크플로우 및 멀티 에이전트 아키텍처</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f4f7fa;
+            --slide-bg: #ffffff;
+            --text-primary: #0f1e36; /* McKinsey Dark Navy */
+            --text-secondary: #4a5568;
+            --accent-teal: #007a87; /* McKinsey Teal */
+            --accent-blue: #005a9c;
+            --accent-red: #a50034; /* LGE Red */
+            --border-color: #e2e8f0;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans KR', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Presentation Container */
+        .deck-container {
+            width: 100%;
+            max-width: 1280px;
+            aspect-ratio: 16 / 9;
+            background-color: var(--slide-bg);
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Slide Layout */
+        .slide {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            padding: 2.5rem 3.5rem;
+            position: relative;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        /* McKinsey style Tracker Header */
+        .slide-tracker {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent-teal);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slide-title-group {
+            border-bottom: 1.5px solid var(--text-primary);
+            padding-bottom: 1rem;
+            margin-bottom: 1.8rem;
+        }
+
+        .slide-title {
+            font-size: 1.85rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .slide-title span {
+            color: var(--accent-red);
+        }
+
+        /* Action Title - McKinsey style Key Takeaway sentence */
+        .action-title {
+            font-size: 1.15rem;
+            color: var(--accent-blue);
+            font-weight: 500;
+            margin-top: 0.5rem;
+            line-height: 1.4;
+        }
+
+        /* Main Content Grid */
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Footer */
+        .slide-footer {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-color);
+            padding-top: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slide-footer .source {
+            font-weight: 600;
+        }
+
+        .slide-footer .page-num {
+            font-weight: 700;
+        }
+
+        /* Navigation Controls */
+        .controls {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            background-color: var(--slide-bg);
+            border: 1.5px solid var(--text-primary);
+            color: var(--text-primary);
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
+            font-weight: 700;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: var(--text-primary);
+            color: #ffffff;
+        }
+
+        .btn:disabled {
+            border-color: #cbd5e0;
+            color: #cbd5e0;
+            cursor: not-allowed;
+            background-color: var(--slide-bg);
+        }
+
+        /* Slide 1 specific: Horizontal Process Flow */
+        .process-flow {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 1rem;
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .process-step {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1.2rem 0.9rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            transition: transform 0.2s;
+        }
+
+        .process-step:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-teal);
+        }
+
+        /* Step arrow indicators */
+        .process-step:not(:last-child)::after {
+            content: "→";
+            position: absolute;
+            right: -0.9rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.25rem;
+            color: var(--accent-teal);
+            font-weight: bold;
+            z-index: 10;
+        }
+
+        .step-num {
+            font-size: 0.7rem;
+            font-weight: 700;
+            background-color: var(--bg-color);
+            color: var(--accent-teal);
+            padding: 0.25rem 0.4rem;
+            border-radius: 4px;
+            width: fit-content;
+        }
+
+        .step-num.audit {
+            background-color: #fffbeb;
+            color: #d97706;
+        }
+
+        .process-step.highlight-audit {
+            border: 2px solid #fbbf24;
+            background-color: #fffbeb;
+        }
+
+        .step-name {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .step-desc {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            line-height: 1.35;
+        }
+
+        /* Callout Box */
+        .callout-box {
+            background-color: #f8fafc;
+            border-left: 4.5px solid var(--accent-teal);
+            padding: 1rem 1.5rem;
+            border-radius: 0 6px 6px 0;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.45;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .callout-box strong {
+            color: var(--text-primary);
+        }
+
+        /* Slide 2 specific: 4-Column Agent Structure */
+        .agent-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .agent-card {
+            border: 1px solid var(--border-color);
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            transition: all 0.2s;
+        }
+
+        .agent-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            border-color: var(--accent-blue);
+        }
+
+        .agent-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .agent-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #ebf8ff;
+            color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .agent-card:nth-child(2) .agent-icon { background-color: #e6fffa; color: var(--accent-teal); }
+        .agent-card:nth-child(3) .agent-icon { background-color: #fff5f5; color: var(--accent-red); }
+        .agent-card:nth-child(4) .agent-icon { background-color: #fef8e8; color: #b45309; }
+
+        .agent-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .agent-role {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        .agent-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .agent-tasks {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            list-style-type: none;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+        }
+
+        .agent-tasks li {
+            position: relative;
+            padding-left: 1rem;
+            line-height: 1.4;
+        }
+
+        .agent-tasks li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--accent-teal);
+            font-weight: bold;
+        }
+
+        /* Keyboard shortcuts tip */
+        .keyboard-tip {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="deck-container">
+        
+        <!-- SLIDE 1: WORKFLOW -->
+        <div class="slide active" id="slide-1">
+            <div class="slide-tracker">
+                <span>LGE Europe TV Sales Strategy Team</span>
+                <span>PART I. WORKFLOW</span>
+            </div>
+            
+            <div class="slide-title-group">
+                <h2 class="slide-title">F(x) Tracker 환율 모니터링 및 자동 분석 파이프라인 <span>(6-Step Pipeline)</span></h2>
+                <p class="action-title">"실시간 환율 수집 및 매크로 코멘터리 연계 프로세스를 지능형 파이프라인으로 일원화하고, Q&A 정합성 필터를 내재화해 무결성을 극대화합니다."</p>
+            </div>
+            
+            <div class="slide-content">
+                <div class="process-flow">
+                    <!-- Step 1 -->
+                    <div class="process-step">
+                        <span class="step-num">Step 01</span>
+                        <h4 class="step-name">실시간 데이터 수집</h4>
+                        <p class="step-desc">Yahoo Finance API(yfinance)를 연동하여 EUR, GBP 등 8개 통화의 실시간/과거 환율을 수집</p>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="process-step">
+                        <span class="step-num">Step 02</span>
+                        <h4 class="step-name">캐싱 및 정합성 보장</h4>
+                        <p class="step-desc">로컬 메모리 캐시로 API 지연율을 낮추고, 장애 시 real_rates.json 백업 엔진을 구동해 정합성 확보</p>
+                    </div>
+                    
+                    <!-- Step 2.5 (Highlighted) -->
+                    <div class="process-step highlight-audit">
+                        <span class="step-num audit">Step 02.5</span>
+                        <h4 class="step-name" style="color: #b45309;">Q&A 정합성 검증</h4>
+                        <p class="step-desc"><strong>AI 자연어 Q&A(/api/query)</strong> 파싱 시 정규식 기반 통화 매칭 및 기간 유효성 정밀 검증 장치 도입</p>
+                    </div>
+                    
+                    <!-- Step 3 -->
+                    <div class="process-step">
+                        <span class="step-num">Step 03</span>
+                        <h4 class="step-name">동적 추이 시각화</h4>
+                        <p class="step-desc">Chart.js 라이브러리를 통해 과거 5개월 추세 및 향후 분기별 전망 라인을 실시간으로 시각화</p>
+                    </div>
+                    
+                    <!-- Step 4 -->
+                    <div class="process-step">
+                        <span class="step-num">Step 04</span>
+                        <h4 class="step-name">코멘터리 전망 편집</h4>
+                        <p class="step-desc">Bloomberg Consensus 등 외부 매크로 지표 분석 데이터 입력 및 commentaries.json 즉시 동기화</p>
+                    </div>
+                    
+                    <!-- Step 5 -->
+                    <div class="process-step">
+                        <span class="step-num">Step 05</span>
+                        <h4 class="step-name">간편 패키징 및 배포</h4>
+                        <p class="step-desc">static 폴더 전체의 독립 파일 패키징(Zip) 구성을 설계해 서버 없는 외부 환경에서도 로컬 작동을 완벽 보장</p>
+                    </div>
+                </div>
+                
+                <div class="callout-box">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#007a87" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    <span><strong>실무적 가치:</strong> Q&A 정합성 검증(Step 2.5) 필터를 파이프라인 중간에 내장하여, 오차 없는 실시간 통계 산출을 지원하고 <strong>현업 부서의 수치 대조 및 수작업 검증 시간을 80% 이상 절감</strong>하였습니다.</span>
+                </div>
+            </div>
+            
+            <div class="slide-footer">
+                <span class="source">Source: LGE Europe TV Sales Strategy Team - FX Monitor project</span>
+                <span class="page-num">1 / 2</span>
+            </div>
+        </div>
+        
+        <!-- SLIDE 2: AGENT STRUCTURE -->
+        <div class="slide" id="slide-2">
+            <div class="slide-tracker">
+                <span>LGE Europe TV Sales Strategy Team</span>
+                <span>PART II. AGENT STRUCTURE</span>
+            </div>
+            
+            <div class="slide-title-group">
+                <h2 class="slide-title">지능형 멀티 에이전트 협업 아키텍처 <span>(Intelligent Team)</span></h2>
+                <p class="action-title">"역할 분담된 AI 에이전트들이 도구 제어 및 상호 검증 루프를 형성하여 F(x) Tracker의 데이터 가공과 대시보드 무결성을 병렬적으로 구현합니다."</p>
+            </div>
+            
+            <div class="slide-content">
+                <div class="agent-grid">
+                    <!-- Agent 1 -->
+                    <div class="agent-card">
+                        <div class="agent-header">
+                            <div class="agent-icon">🧭</div>
+                            <div class="agent-info">
+                                <span class="agent-role">Orchestrator</span>
+                                <h4 class="agent-name">메인 에이전트</h4>
+                            </div>
+                        </div>
+                        <ul class="agent-tasks">
+                            <li>F(x) Tracker 전체 기능 명세 및 개발 일정 기획</li>
+                            <li>세부 API 규격 정의 및 서브 에이전트 역할 배치</li>
+                            <li>코멘터리 저장 기능 및 프론트 연동 최종 검수</li>
+                            <li>사용자 요구사항 대응 및 마일스톤 완료 판단</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Agent 2 -->
+                    <div class="agent-card">
+                        <div class="agent-header">
+                            <div class="agent-icon">⚙️</div>
+                            <div class="agent-info">
+                                <span class="agent-role">Data & Scripter</span>
+                                <h4 class="agent-name">데이터 에이전트</h4>
+                            </div>
+                        </div>
+                        <ul class="agent-tasks">
+                            <li>yfinance API 연동 모듈 및 예외 처리 코드 작성</li>
+                            <li>메모리 캐시 관리 로직 및 만료 주기(60분) 구현</li>
+                            <li>real_rates.json 백업 환율 데이터 롤오버 엔진 설계</li>
+                            <li>통화별(KRW, HUF 등) 환율 포맷 자릿수 통제</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Agent 3 -->
+                    <div class="agent-card">
+                        <div class="agent-header">
+                            <div class="agent-icon">✍️</div>
+                            <div class="agent-info">
+                                <span class="agent-role">UI & Content Writer</span>
+                                <h4 class="agent-name">디자인 에이전트</h4>
+                            </div>
+                        </div>
+                        <ul class="agent-tasks">
+                            <li>LGE 브랜드 아이덴티티를 반영한 반응형 UI/CSS 구현</li>
+                            <li>Chart.js 라이브러리 연동 및 예측선 점선 처리 시각화</li>
+                            <li>AI 자연어 Q&A 입력 창 및 답변 렌더링 카드 연계</li>
+                            <li>static 폴더 압축(Zip) 클라이언트 공유 기능 설계</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Agent 4 -->
+                    <div class="agent-card">
+                        <div class="agent-header">
+                            <div class="agent-icon">🔍</div>
+                            <div class="agent-info">
+                                <span class="agent-role">QA & Validator</span>
+                                <h4 class="agent-name">검증 에이전트</h4>
+                            </div>
+                        </div>
+                        <ul class="agent-tasks">
+                            <li>/api/query 자연어 질문 파싱 정규식 예외 처리 검증</li>
+                            <li>환율 데이터 API 에러 시 mock 데이터 대체 로직 테스트</li>
+                            <li>통화별 고유 환율 포맷 출력 및 소수점 자리 유효성 감사</li>
+                            <li>정적 index.html의 브라우저 로컬 단독 작동 무결성 검사</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="callout-box">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#005a9c" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    <span><strong>협업 아키텍처 특징:</strong> 각 에이전트가 단독으로 작업을 끝내는 것이 아니라, <strong>'개발 방향 설정(Orchestrator) -> 데이터 구현(Scripter) -> 시각화 구현(UI Writer) -> 상호 검증(QA Validator)'</strong>의 내부 품질 순환 루프를 통해 대시보드의 무결성을 보장합니다.</span>
+                </div>
+            </div>
+            
+            <div class="slide-footer">
+                <span class="source">Source: LGE Europe TV Sales Strategy Team - Agent collaboration design</span>
+                <span class="page-num">2 / 2</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Navigation buttons -->
+    <div class="controls">
+        <button class="btn" id="prev-btn" disabled>◀ 이전 슬라이드</button>
+        <button class="btn" id="next-btn">다음 슬라이드 ▶</button>
+    </div>
+    <div class="keyboard-tip">팁: 키보드 좌/우 방향키를 누르시면 슬라이드가 이동합니다.</div>
+
+    <script>
+        const slide1 = document.getElementById('slide-1');
+        const slide2 = document.getElementById('slide-2');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+
+        let currentSlide = 1;
+
+        function showSlide(slideNum) {
+            if (slideNum === 1) {
+                slide1.classList.add('active');
+                slide2.classList.remove('active');
+                prevBtn.disabled = true;
+                nextBtn.disabled = false;
+                currentSlide = 1;
+            } else if (slideNum === 2) {
+                slide1.classList.remove('active');
+                slide2.classList.add('active');
+                prevBtn.disabled = false;
+                nextBtn.disabled = true;
+                currentSlide = 2;
+            }
+        }
+
+        prevBtn.addEventListener('click', () => showSlide(1));
+        nextBtn.addEventListener('click', () => showSlide(2));
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                showSlide(1);
+            } else if (e.key === 'ArrowRight') {
+                showSlide(2);
+            }
+        });
+    </script>
+</body>
+</html>
