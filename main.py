@@ -2,13 +2,25 @@ import os
 import re
 import json
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
+
+load_dotenv()
+
 import pandas as pd
 import yfinance as yf
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
 from pydantic import BaseModel
+from services.exchange_service import (
+    generate_mock_data as service_generate_mock_data,
+    get_exchange_rates as service_get_exchange_rates
+)
+from services.commentary_service import (
+    inject_commentary as service_inject_commentary,
+    get_commentary_data,
+    update_commentary_data
+)
 
 app = FastAPI(title="F(x) Tracker API", version="2.0.0")
 
@@ -33,340 +45,27 @@ CURRENCY_MAP = {
     "KRW": {"ticker": "USDKRW=X", "name": "대한민국 원 (USD/KRW)", "symbol": "USD/KRW", "format": "{:.0f}"}
 }
 
+# Data File Paths
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(BASE_DIR, "data")
+REAL_RATES_FILE = os.path.join(DATA_DIR, "real_rates.json")
+COMMENTARIES_FILE = os.path.join(DATA_DIR, "commentaries.json")
+
 # Memory Cache for Exchange Rate Data
 # Structure: {currency: {"timestamp": datetime, "data": dict}}
 DATA_CACHE = {}
-CACHE_EXPIRATION_MINUTES = 60
+CACHE_EXPIRATION_MINUTES = int(os.environ.get("CACHE_EXPIRE_MINUTES", 60))
 
 # Current Local Time Simulation: 2026-07-06 (Monday)
 CURRENT_DATE = datetime(2026, 7, 6)
 
 def generate_mock_data(currency: str) -> dict:
-    """Generates realistic historical and daily exchange rates for 2026, falling back to real_rates.json template and auto-rolling over up to today."""
-    monthly_records = []
-    daily_records = []
-    
-    # Baseline exchange rates updated to match actual June 2026 values
-    baselines = {
-        "EUR": 1.1582,
-        "GBP": 1.3404,
-        "CZK": 20.8837,
-        "HUF": 305.7940,
-        "PLN": 3.6607,
-        "RON": 4.5248,
-        "CHF": 0.7929,
-        "KRW": 1525.0000
-    }
-    
-    has_real_file = False
-    if os.path.exists("real_rates.json"):
-        try:
-            with open("real_rates.json", "r", encoding="utf-8") as f:
-                real_data = json.load(f)
-            if currency in real_data:
-                info = real_data[currency]
-                has_real_file = True
-                # Extract template monthly averages
-                for m_str, rate in info.get("monthly_averages", {}).items():
-                    m_int = int(m_str)
-                    monthly_records.append({
-                        "label": f"2026년 {m_int:02d}월 평균",
-                        "date": f"2026-{m_int:02d}-01",
-                        "type": "monthly_avg",
-                        "rate": float(rate)
-                    })
-                # Extract template daily
-                for key in ["june_daily", "july_daily"]:
-                    for r in info.get(key, []):
-                        daily_records.append({
-                            "label": r["label"],
-                            "date": r["date"],
-                            "type": "daily",
-                            "rate": float(r["rate"])
-                        })
-        except Exception as e:
-            print(f"Error loading real_rates.json: {e}")
-            
-    if not has_real_file:
-        base_rate = baselines.get(currency, 1.0)
-        
-        # Build 1~5월 평균
-        monthly_multipliers = {
-            "EUR": {1: 1.0134, 2: 1.0212, 3: 0.9987, 4: 1.0091, 5: 1.0086},
-            "GBP": {1: 1.0087, 2: 1.0137, 3: 0.9959, 4: 1.0023, 5: 1.0067},
-            "CZK": {1: 0.9891, 2: 0.9814, 3: 1.0102, 4: 0.9986, 5: 0.9962},
-            "HUF": {1: 1.0688, 2: 1.0459, 3: 1.0961, 4: 1.0345, 5: 1.0020},
-            "PLN": {1: 0.9797, 2: 0.9736, 3: 1.0071, 4: 0.9936, 5: 0.9915},
-            "RON": {1: 0.9579, 2: 0.9510, 3: 0.9718, 4: 0.9623, 5: 0.9876},
-            "CHF": {1: 0.9966, 2: 0.9747, 3: 0.9911, 4: 0.9946, 5: 0.9877},
-            "KRW": {1: 0.9530, 2: 0.9486, 3: 0.9738, 4: 0.9734, 5: 0.9755}
-        }.get(currency, {1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0})
-        
-        for m in range(1, 6):
-            mult = monthly_multipliers.get(m, 1.0)
-            monthly_records.append({
-                "label": f"2026년 {m:02d}월 평균",
-                "date": f"2026-{m:02d}-01",
-                "type": "monthly_avg",
-                "rate": round(base_rate * mult, 6)
-            })
-            
-    # Dynamically simulate daily rates from 2026-06-01 up to today
-    now_date = datetime.now()
-    current_year = now_date.year
-    current_month = now_date.month
-    current_day = now_date.day
-    
-    daily_records.sort(key=lambda x: x["date"])
-    last_rate = daily_records[-1]["rate"] if daily_records else (baselines.get(currency, 1.0) if not has_real_file else 1.0)
-    
-    start_year = 2026
-    start_month = 6
-    
-    simulated_daily = []
-    y = start_year
-    m = start_month
-    
-    while y < current_year or (y == current_year and m <= current_month):
-        is_curr_m = (y == current_year and m == current_month)
-        
-        # Last day of month
-        if m == 12:
-            next_m_first = datetime(y + 1, 1, 1)
-        else:
-            next_m_first = datetime(y, m + 1, 1)
-        last_day = (next_m_first - timedelta(days=1)).day
-        
-        limit_day = current_day if is_curr_m else last_day
-        
-        month_rates = []
-        month_daily = []
-        
-        for d in range(1, limit_day + 1):
-            try:
-                date_obj = datetime(y, m, d)
-            except ValueError:
-                continue
-                
-            date_str = date_obj.strftime("%Y-%m-%d")
-            
-            existing = next((r for r in daily_records if r["date"] == date_str), None)
-            if existing:
-                rate_val = existing["rate"]
-                last_rate = rate_val
-            elif date_obj.weekday() >= 5:  # Weekend: carry over Friday's rate
-                rate_val = last_rate
-            else:  # Business day: simulate
-                day_seed = (d * 17) % 31
-                change_pct = (day_seed - 15) * 0.001
-                rate_val = last_rate * (1.0 + change_pct)
-                last_rate = rate_val
-                
-            month_rates.append(rate_val)
-            month_daily.append({
-                "label": date_str,
-                "date": date_str,
-                "type": "daily",
-                "rate": round(rate_val, 6)
-            })
-            
-        if is_curr_m:
-            simulated_daily = month_daily
-        else:
-            if month_rates:
-                avg_rate = sum(month_rates) / len(month_rates)
-                label_str = f"{y}년 {m:02d}월 평균"
-                date_str = f"{y}-{m:02d}-01"
-                if not any(r["label"] == label_str for r in monthly_records):
-                    monthly_records.append({
-                        "label": label_str,
-                        "date": date_str,
-                        "type": "monthly_avg",
-                        "rate": round(avg_rate, 6)
-                    })
-                    
-        m += 1
-        if m > 12:
-            m = 1
-            y += 1
-            
-    all_records = monthly_records + simulated_daily
-    all_records.sort(key=lambda x: x["date"])
-    
-    curr_rates = [r["rate"] for r in simulated_daily]
-    cum_avg = sum(curr_rates) / len(curr_rates) if curr_rates else last_rate
-    
-    return {
-        "currency": currency,
-        "name": CURRENCY_MAP[currency]["name"],
-        "symbol": CURRENCY_MAP[currency]["symbol"],
-        "format": CURRENCY_MAP[currency]["format"],
-        "records": all_records,
-        "cumulative_average": round(cum_avg, 6)
-    }
+    """Delegates mock data generation to exchange_service."""
+    return service_generate_mock_data(currency, CURRENCY_MAP, REAL_RATES_FILE)
 
 def get_exchange_rates(currency: str) -> dict:
-    """Fetches exchange rates from Yahoo Finance, falling back to mock generator on error."""
-    now = datetime.now()
-    
-    # Check cache
-    if currency in DATA_CACHE:
-        cache_time = DATA_CACHE[currency]["timestamp"]
-        if now - cache_time < timedelta(minutes=CACHE_EXPIRATION_MINUTES):
-            return DATA_CACHE[currency]["data"]
-            
-    ticker_info = CURRENCY_MAP.get(currency)
-    if not ticker_info:
-        raise HTTPException(status_code=404, detail="Currency not supported")
-        
-    ticker = ticker_info["ticker"]
-    
-    try:
-        # Fetch historical data for 2026 up to today
-        # End date in yfinance is exclusive, so we use tomorrow to fetch today's rate
-        tomorrow = now + timedelta(days=1)
-        end_date_str = tomorrow.strftime("%Y-%m-%d")
-        
-        ticker_obj = yf.Ticker(ticker)
-        df = ticker_obj.history(start="2026-01-01", end=end_date_str)
-        
-        if df.empty:
-            raise ValueError("No historical data found from yfinance")
-            
-        # Process DataFrame
-        df = df.reset_index()
-        # Parse Dates
-        df['Date'] = pd.to_datetime(df['Date']).dt.tz_localize(None)
-        
-        # Filter for 2026
-        df_2026 = df[df['Date'].dt.year == 2026]
-        
-        if df_2026.empty:
-            raise ValueError("No 2026 data in yfinance response")
-            
-        records = []
-        current_month = now.month
-        current_year = now.year
-        
-        # Load official values from real_rates.json to prioritize company's official rates
-        official_monthly = {}
-        official_daily = {}
-        if os.path.exists("real_rates.json"):
-            try:
-                with open("real_rates.json", "r", encoding="utf-8") as f:
-                    real_data = json.load(f)
-                if currency in real_data:
-                    info = real_data[currency]
-                    for m_str, rate in info.get("monthly_averages", {}).items():
-                        official_monthly[int(m_str)] = float(rate)
-                    for key in ["june_daily", "july_daily"]:
-                        for r in info.get(key, []):
-                            official_daily[r["date"]] = float(r["rate"])
-            except Exception as e:
-                print(f"Error reading real_rates.json in get_exchange_rates: {e}")
-
-        # 1. Monthly Averages (Jan to previous month)
-        df_past = df_2026[df_2026['Date'].dt.month < current_month]
-        for month in range(1, current_month):
-            if month in official_monthly:
-                val = official_monthly[month]
-            else:
-                if not df_past.empty:
-                    df_month = df_past[df_past['Date'].dt.month == month]
-                    if not df_month.empty:
-                        val = float(df_month['Close'].mean())
-                    else:
-                        val = baselines.get(currency, 1.0)
-                else:
-                    val = baselines.get(currency, 1.0)
-                    
-            records.append({
-                "label": f"{current_year}년 {month:02d}월 평균",
-                "date": f"{current_year}-{month:02d}-01",
-                "type": "monthly_avg",
-                "rate": val
-            })
-                    
-        # 2. Current Month Daily Rates (1st of current month to today, including weekends)
-        df_current = df_2026[df_2026['Date'].dt.month == current_month]
-        current_rates = []
-        
-        # Build yfinance rates dictionary if available
-        fetched_rates = {}
-        if not df_current.empty:
-            for idx, row in df_current.iterrows():
-                d_str = row['Date'].strftime("%Y-%m-%d")
-                fetched_rates[d_str] = float(row['Close'])
-                
-        # Resolve initial rate for filling forward
-        last_rate = None
-        if not df_past.empty:
-            last_rate = float(df_past.iloc[-1]['Close'])
-        if last_rate is None:
-            sorted_dates = sorted(fetched_rates.keys())
-            if sorted_dates:
-                last_rate = fetched_rates[sorted_dates[0]]
-            else:
-                last_rate = baselines.get(currency, 1.0)
-                
-        limit_day = now.day
-        for d in range(1, limit_day + 1):
-            try:
-                date_obj = datetime(current_year, current_month, d)
-            except ValueError:
-                continue
-            date_str = date_obj.strftime("%Y-%m-%d")
-            
-            # Prioritize: 1) official JSON, 2) yfinance API, 3) carry forward
-            if date_str in official_daily:
-                rate_val = official_daily[date_str]
-                last_rate = rate_val
-            elif date_str in fetched_rates:
-                rate_val = fetched_rates[date_str]
-                last_rate = rate_val
-            else:
-                # Weekend or holiday
-                rate_val = last_rate
-                
-            records.append({
-                "label": date_str,
-                "date": date_str,
-                "type": "daily",
-                "rate": rate_val
-            })
-            current_rates.append(rate_val)
-                    
-        # Sort records by date to ensure proper order
-        records.sort(key=lambda x: x["date"])
-        
-        # Calculate current month cumulative average
-        cum_avg = sum(current_rates) / len(current_rates) if current_rates else 0.0
-        
-        result = {
-            "currency": currency,
-            "name": ticker_info["name"],
-            "symbol": ticker_info["symbol"],
-            "format": ticker_info["format"],
-            "records": records,
-            "cumulative_average": float(cum_avg)
-        }
-        
-        # Save to cache
-        DATA_CACHE[currency] = {
-            "timestamp": now,
-            "data": result
-        }
-        return result
-        
-    except Exception as e:
-        print(f"yfinance failed for {currency}: {e}. Falling back to Mock Engine.")
-        # Fallback to completely simulated mock data
-        mock_data = generate_mock_data(currency)
-        DATA_CACHE[currency] = {
-            "timestamp": now,
-            "data": mock_data
-        }
-        return mock_data
+    """Delegates exchange rates calculation/fetching to exchange_service."""
+    return service_get_exchange_rates(currency, CURRENCY_MAP, DATA_CACHE, CACHE_EXPIRATION_MINUTES, REAL_RATES_FILE)
 
 
 # API Endpoints
@@ -420,25 +119,8 @@ def get_currencies():
     return result
 
 def inject_commentary(rate_data: dict) -> dict:
-    currency = rate_data["currency"]
-    commentary_info = None
-    if os.path.exists("commentaries.json"):
-        try:
-            with open("commentaries.json", "r", encoding="utf-8") as f:
-                commentaries = json.load(f)
-                commentary_info = commentaries.get(currency)
-        except Exception as e:
-            print(f"Error loading commentaries.json in injection: {e}")
-            
-    if not commentary_info:
-        commentary_info = {
-            "macro_commentary": "환율 동향 분석 데이터가 없습니다. 편집기를 통해 입력해 주세요.",
-            "forecast": {"june_late": 0.0, "q3_avg": 0.0, "q4_avg": 0.0, "source": "Bloomberg Consensus"}
-        }
-    
-    res = dict(rate_data)
-    res["commentary"] = commentary_info
-    return res
+    """Injects commentary using commentary_service."""
+    return service_inject_commentary(rate_data, COMMENTARIES_FILE)
 
 @app.get("/api/rates/{currency}")
 def get_rates(currency: str):
@@ -458,53 +140,20 @@ class CommentaryUpdateRequest(BaseModel):
 def get_commentary(currency: str):
     """Returns commentary and forecast data for a specific currency."""
     currency_upper = currency.upper()
-    if currency_upper not in CURRENCY_MAP:
-        raise HTTPException(status_code=404, detail="Currency not supported")
-    
-    commentaries = {}
-    if os.path.exists("commentaries.json"):
-        try:
-            with open("commentaries.json", "r", encoding="utf-8") as f:
-                commentaries = json.load(f)
-        except Exception as e:
-            print(f"Error loading commentaries.json: {e}")
-            
-    return commentaries.get(currency_upper, {
-        "macro_commentary": "환율 동향 분석 데이터가 없습니다. 편집기를 통해 입력해 주세요.",
-        "forecast": {"june_late": 0.0, "q3_avg": 0.0, "q4_avg": 0.0, "source": "Bloomberg Consensus"}
-    })
+    return get_commentary_data(currency_upper, CURRENCY_MAP, COMMENTARIES_FILE)
 
 @app.post("/api/commentary/{currency}")
 def update_commentary(currency: str, request: CommentaryUpdateRequest):
     """Updates commentary and forecast data for a specific currency."""
     currency_upper = currency.upper()
-    if currency_upper not in CURRENCY_MAP:
-        raise HTTPException(status_code=404, detail="Currency not supported")
-    
-    commentaries = {}
-    if os.path.exists("commentaries.json"):
-        try:
-            with open("commentaries.json", "r", encoding="utf-8") as f:
-                commentaries = json.load(f)
-        except Exception as e:
-            pass
-            
-    commentaries[currency_upper] = {
-        "macro_commentary": request.macro_commentary,
-        "forecast": request.forecast
-    }
-    
-    try:
-        with open("commentaries.json", "w", encoding="utf-8") as f:
-            json.dump(commentaries, f, ensure_ascii=False, indent=2)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to save commentaries: {e}")
-        
-    # Invalidate cache to ensure subsequent queries see new forecast/commentary
-    if currency_upper in DATA_CACHE:
-        del DATA_CACHE[currency_upper]
-        
-    return {"status": "success", "message": f"Commentary for {currency_upper} updated successfully."}
+    return update_commentary_data(
+        currency_upper,
+        request.macro_commentary,
+        request.forecast,
+        CURRENCY_MAP,
+        COMMENTARIES_FILE,
+        DATA_CACHE
+    )
 
 
 class QueryRequest(BaseModel):
@@ -695,8 +344,6 @@ def read_root():
 
 app.mount("/", StaticFiles(directory="static"), name="static")
 
-if __name__ == "__main__":
-    import uvicorn
-    import os
-    port = int(os.environ.get("PORT", 8000))
-    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
+# Note: Execution entrypoint has been centralized in app.py
+# Run server using: python app.py
+
