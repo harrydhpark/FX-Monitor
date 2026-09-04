@@ -21,6 +21,7 @@ from services.commentary_service import (
     get_commentary_data,
     update_commentary_data
 )
+from services.parser_service import parse_official_announcement_text
 
 app = FastAPI(title="F(x) Tracker API", version="2.0.0")
 
@@ -56,8 +57,8 @@ COMMENTARIES_FILE = os.path.join(DATA_DIR, "commentaries.json")
 DATA_CACHE = {}
 CACHE_EXPIRATION_MINUTES = int(os.environ.get("CACHE_EXPIRE_MINUTES", 60))
 
-# Current Local Time Simulation: 2026-07-06 (Monday)
-CURRENT_DATE = datetime(2026, 7, 6)
+# Current Local Time Simulation: 2026-09-04 (Friday)
+CURRENT_DATE = datetime(2026, 9, 4)
 
 def generate_mock_data(currency: str) -> dict:
     """Delegates mock data generation to exchange_service."""
@@ -154,6 +155,90 @@ def update_commentary(currency: str, request: CommentaryUpdateRequest):
         COMMENTARIES_FILE,
         DATA_CACHE
     )
+
+
+@app.get("/healthz")
+def healthz():
+    return {"status": "ok", "time": datetime.now().isoformat()}
+
+class ParseTextRequest(BaseModel):
+    text: str
+
+@app.post("/api/admin/parse-official-text")
+def api_parse_official_text(req: ParseTextRequest):
+    """Parses pasted text from official email/excel announcement and returns preview."""
+    res = parse_official_announcement_text(req.text)
+    if res.get("status") == "error":
+        raise HTTPException(status_code=400, detail=res.get("message"))
+    return res
+
+class SaveOfficialRatesRequest(BaseModel):
+    parsed_data: dict
+    source_label: str = "사내 공식 환율 정보 (TV유럽영업2팀 F(x) Tracker)"
+
+@app.post("/api/admin/save-official-rates")
+def api_save_official_rates(req: SaveOfficialRatesRequest):
+    """Saves parsed official rates into real_rates.json and commentaries.json."""
+    parsed = req.parsed_data
+    if not parsed or "currencies" not in parsed:
+        raise HTTPException(status_code=400, detail="Invalid parsed data")
+
+    try:
+        real_data = {}
+        if os.path.exists(REAL_RATES_FILE):
+            with open(REAL_RATES_FILE, "r", encoding="utf-8") as f:
+                real_data = json.load(f)
+
+        comm_data = {}
+        if os.path.exists(COMMENTARIES_FILE):
+            with open(COMMENTARIES_FILE, "r", encoding="utf-8") as f:
+                comm_data = json.load(f)
+
+        for cur in parsed["currencies"]:
+            if cur not in real_data:
+                real_data[cur] = {"monthly_averages": {}, "september_daily": [], "cumulative_average": 0.0}
+
+            # Update monthly averages
+            if cur in parsed.get("monthly_averages", {}):
+                real_data[cur]["monthly_averages"].update(parsed["monthly_averages"][cur])
+
+            # Update daily records
+            if cur in parsed.get("daily_records", {}) and parsed["daily_records"][cur]:
+                real_data[cur]["september_daily"] = parsed["daily_records"][cur]
+
+            # Update cumulative average
+            if cur in parsed.get("cumulative_averages", {}):
+                real_data[cur]["cumulative_average"] = parsed["cumulative_averages"][cur]
+
+            # Update commentaries forecast
+            if cur in comm_data:
+                fc = comm_data[cur].get("forecast", {})
+                if cur in parsed.get("month_end_forecast", {}):
+                    fc["month_end"] = parsed["month_end_forecast"][cur]
+                    fc["june_late"] = parsed["month_end_forecast"][cur]
+                fc["source"] = req.source_label
+                # Recalculate 3Q average if 7, 8, month_end available
+                m_avg = real_data[cur].get("monthly_averages", {})
+                if "7" in m_avg and "8" in m_avg and "month_end" in fc:
+                    q3 = (float(m_avg["7"]) + float(m_avg["8"]) + float(fc["month_end"])) / 3.0
+                    fc["q3_avg"] = round(q3, 3 if cur not in ["KRW", "CZK", "HUF", "PLN"] else (1 if cur == "KRW" else 2))
+                comm_data[cur]["forecast"] = fc
+
+        # Save files atomically
+        with open(REAL_RATES_FILE, "w", encoding="utf-8") as f:
+            json.dump(real_data, f, ensure_ascii=False, indent=2)
+
+        with open(COMMENTARIES_FILE, "w", encoding="utf-8") as f:
+            json.dump(comm_data, f, ensure_ascii=False, indent=2)
+
+        DATA_CACHE.clear()
+        return {
+            "status": "success",
+            "message": "사내 공식 환율 실적이 성공적으로 기록되었습니다.",
+            "updated_currencies": parsed["currencies"]
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to save official rates: {e}")
 
 
 class QueryRequest(BaseModel):

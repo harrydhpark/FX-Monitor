@@ -2,8 +2,8 @@ import os
 import json
 from datetime import datetime, timedelta
 import pandas as pd
-import yfinance as yf
 from fastapi import HTTPException
+from services.hybrid_rate_service import get_hybrid_exchange_rates
 
 def generate_mock_data(currency: str, currency_map: dict, real_rates_file: str) -> dict:
     """Generates realistic historical and daily exchange rates for 2026, falling back to real_rates.json template."""
@@ -37,7 +37,7 @@ def generate_mock_data(currency: str, currency_map: dict, real_rates_file: str) 
                         "type": "monthly_avg",
                         "rate": float(rate)
                     })
-                for key in ["june_daily", "july_daily"]:
+                for key in ["june_daily", "july_daily", "august_daily", "september_daily", "daily"]:
                     for r in info.get(key, []):
                         daily_records.append({
                             "label": r["date"],
@@ -79,7 +79,7 @@ def generate_mock_data(currency: str, currency_map: dict, real_rates_file: str) 
     last_rate = daily_records[-1]["rate"] if daily_records else (baselines.get(currency, 1.0) if not has_real_file else 1.0)
     
     start_year = 2026
-    start_month = 6
+    start_month = 9
     
     simulated_daily = []
     y = start_year
@@ -148,7 +148,10 @@ def generate_mock_data(currency: str, currency_map: dict, real_rates_file: str) 
     all_records.sort(key=lambda x: x["date"])
     
     curr_rates = [r["rate"] for r in simulated_daily]
-    cum_avg = sum(curr_rates) / len(curr_rates) if curr_rates else last_rate
+    if has_real_file and "cumulative_average" in real_data.get(currency, {}):
+        cum_avg = float(real_data[currency]["cumulative_average"])
+    else:
+        cum_avg = sum(curr_rates) / len(curr_rates) if curr_rates else last_rate
     
     return {
         "currency": currency,
@@ -160,7 +163,7 @@ def generate_mock_data(currency: str, currency_map: dict, real_rates_file: str) 
     }
 
 def get_exchange_rates(currency: str, currency_map: dict, data_cache: dict, cache_expire_minutes: int, real_rates_file: str) -> dict:
-    """Fetches exchange rates from Yahoo Finance, falling back to mock generator on error."""
+    """Fetches exchange rates using the hybrid service (Official Actuals + ECB live rates)."""
     now = datetime.now()
     
     if currency in data_cache:
@@ -168,137 +171,18 @@ def get_exchange_rates(currency: str, currency_map: dict, data_cache: dict, cach
         if now - cache_time < timedelta(minutes=cache_expire_minutes):
             return data_cache[currency]["data"]
             
-    ticker_info = currency_map.get(currency)
-    if not ticker_info:
+    if currency not in currency_map:
         raise HTTPException(status_code=404, detail="Currency not supported")
         
-    ticker = ticker_info["ticker"]
-    baselines = {
-        "EUR": 1.1582, "GBP": 1.3404, "CZK": 20.8837, "HUF": 305.7940,
-        "PLN": 3.6607, "RON": 4.5248, "CHF": 0.7929, "KRW": 1525.0000
-    }
-    
     try:
-        tomorrow = now + timedelta(days=1)
-        end_date_str = tomorrow.strftime("%Y-%m-%d")
-        
-        ticker_obj = yf.Ticker(ticker)
-        df = ticker_obj.history(start="2026-01-01", end=end_date_str)
-        
-        if df.empty:
-            raise ValueError("No historical data found from yfinance")
-            
-        df = df.reset_index()
-        df['Date'] = pd.to_datetime(df['Date']).dt.tz_localize(None)
-        df_2026 = df[df['Date'].dt.year == 2026]
-        
-        if df_2026.empty:
-            raise ValueError("No 2026 data in yfinance response")
-            
-        records = []
-        current_month = now.month
-        current_year = now.year
-        
-        official_monthly = {}
-        official_daily = {}
-        if os.path.exists(real_rates_file):
-            try:
-                with open(real_rates_file, "r", encoding="utf-8") as f:
-                    real_data = json.load(f)
-                if currency in real_data:
-                    info = real_data[currency]
-                    for m_str, rate in info.get("monthly_averages", {}).items():
-                        official_monthly[int(m_str)] = float(rate)
-                    for key in ["june_daily", "july_daily"]:
-                        for r in info.get(key, []):
-                            official_daily[r["date"]] = float(r["rate"])
-            except Exception as e:
-                print(f"Error reading real_rates.json in get_exchange_rates: {e}")
-
-        df_past = df_2026[df_2026['Date'].dt.month < current_month]
-        for month in range(1, current_month):
-            if month in official_monthly:
-                val = official_monthly[month]
-            else:
-                if not df_past.empty:
-                    df_month = df_past[df_past['Date'].dt.month == month]
-                    if not df_month.empty:
-                        val = float(df_month['Close'].mean())
-                    else:
-                        val = baselines.get(currency, 1.0)
-                else:
-                    val = baselines.get(currency, 1.0)
-                    
-            records.append({
-                "label": f"{current_year}년 {month:02d}월 평균",
-                "date": f"{current_year}-{month:02d}-01",
-                "type": "monthly_avg",
-                "rate": val
-            })
-                    
-        df_current = df_2026[df_2026['Date'].dt.month == current_month]
-        current_rates = []
-        fetched_rates = {}
-        if not df_current.empty:
-            for idx, row in df_current.iterrows():
-                d_str = row['Date'].strftime("%Y-%m-%d")
-                fetched_rates[d_str] = float(row['Close'])
-                
-        last_rate = None
-        if not df_past.empty:
-            last_rate = float(df_past.iloc[-1]['Close'])
-        if last_rate is None:
-            sorted_dates = sorted(fetched_rates.keys())
-            if sorted_dates:
-                last_rate = fetched_rates[sorted_dates[0]]
-            else:
-                last_rate = baselines.get(currency, 1.0)
-                
-        limit_day = now.day
-        for d in range(1, limit_day + 1):
-            try:
-                date_obj = datetime(current_year, current_month, d)
-            except ValueError:
-                continue
-            date_str = date_obj.strftime("%Y-%m-%d")
-            
-            if date_str in official_daily:
-                rate_val = official_daily[date_str]
-                last_rate = rate_val
-            elif date_str in fetched_rates:
-                rate_val = fetched_rates[date_str]
-                last_rate = rate_val
-            else:
-                rate_val = last_rate
-                
-            records.append({
-                "label": date_str,
-                "date": date_str,
-                "type": "daily",
-                "rate": rate_val
-            })
-            current_rates.append(rate_val)
-                    
-        records.sort(key=lambda x: x["date"])
-        cum_avg = sum(current_rates) / len(current_rates) if current_rates else 0.0
-        
-        result = {
-            "currency": currency,
-            "name": ticker_info["name"],
-            "symbol": ticker_info["symbol"],
-            "format": ticker_info["format"],
-            "records": records,
-            "cumulative_average": float(cum_avg)
-        }
-        
+        result = get_hybrid_exchange_rates(currency, currency_map, real_rates_file)
         data_cache[currency] = {
             "timestamp": now,
             "data": result
         }
         return result
-        
     except Exception as e:
-        print(f"yfinance failed for {currency}: {e}. Falling back to Mock Engine.")
+        print(f"Hybrid rate engine failed for {currency}: {e}. Falling back to mock generator.")
         mock_data = generate_mock_data(currency, currency_map, real_rates_file)
         data_cache[currency] = {
             "timestamp": now,
