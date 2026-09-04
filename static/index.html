@@ -226,8 +226,18 @@
                 <!-- Interactive Chart Card -->
                 <div class="analysis-card chart-card">
                     <div class="card-header-with-action">
-                        <h2 class="analysis-card-title">환율 추이 및 전망 시각화 (Forecast Trend)</h2>
-                        <span class="chart-legend-info">* 점선(Dashed)은 당월 말 및 3Q/4Q 예측선</span>
+                        <div>
+                            <h2 class="analysis-card-title" id="chart-main-title">환율 추이 및 전망 시각화 (Forecast Trend)</h2>
+                            <span class="chart-legend-info" id="chart-sub-info">* 점선(Dashed)은 당월 말 및 4Q 예측선</span>
+                        </div>
+                        <div class="chart-view-toggle">
+                            <button type="button" class="toggle-btn active" id="btn-view-2026">
+                                <span class="material-icons-outlined" style="font-size: 14px; vertical-align: middle;">calendar_today</span> 2026년 상세
+                            </button>
+                            <button type="button" class="toggle-btn" id="btn-view-5yr">
+                                <span class="material-icons-outlined" style="font-size: 14px; vertical-align: middle;">insights</span> 최근 5개년 (2022~2026)
+                            </button>
+                        </div>
                     </div>
                     <div class="chart-wrapper">
                         <canvas id="rateTrendChart"></canvas>
@@ -326,6 +336,6 @@
         </main>
     </div>
     
-    <script src="app.js?v=2.2.0"></script>
+    <script src="app.js?v=2.3.0"></script>
 </body>
 </html>

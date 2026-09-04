@@ -1,4 +1,4 @@
-const FX_APP_VERSION = '2.2.0';
+const FX_APP_VERSION = '2.3.0';
 
 function checkAndMigrateStorage() {
     try {
@@ -1040,7 +1040,51 @@ function renderMonthlyForecastCard(data, commentary) {
     }
 }
 
+
+// Historical 5-Year Annual Average Rates (2022~2025 Official Annual Fixings)
+const HISTORICAL_5YR_RATES = {
+    "EUR": { "2022": 1.0530, "2023": 1.0810, "2024": 1.0822, "2025": 1.1274 },
+    "GBP": { "2022": 1.2370, "2023": 1.2426, "2024": 1.2782, "2025": 1.3169 },
+    "CZK": { "2022": 23.38, "2023": 22.21, "2024": 23.21, "2025": 21.91 },
+    "HUF": { "2022": 373.02, "2023": 353.36, "2024": 365.30, "2025": 353.10 },
+    "PLN": { "2022": 4.4614, "2023": 4.2030, "2024": 3.9789, "2025": 3.7600 },
+    "RON": { "2022": 4.6917, "2023": 4.5763, "2024": 4.5968, "2025": 4.4707 },
+    "CHF": { "2022": 1.0472, "2023": 1.1123, "2024": 1.1361, "2025": 1.2029 },
+    "KRW": { "2022": 1292.0, "2023": 1305.4, "2024": 1365.2, "2025": 1421.5 }
+};
+
+let chartViewMode = '2026'; // '2026' or '5yr'
+
+function calc2026YtdAverage(data) {
+    if (!data || !data.records) return null;
+    const records = data.records;
+    const monthlyAvgs = records.filter(r => r.type === 'monthly_avg' && r.label && r.label.includes('2026년'));
+    const dailySep = records.filter(r => r.type === 'daily' && r.date && r.date.startsWith('2026-09'));
+    let sepAvg = data.cumulative_average;
+    if (!sepAvg && dailySep.length > 0) {
+        sepAvg = dailySep.reduce((a, b) => a + b.rate, 0) / dailySep.length;
+    }
+    const allRates = monthlyAvgs.map(r => r.rate);
+    if (sepAvg) allRates.push(sepAvg);
+    if (allRates.length === 0) return data.cumulative_average || null;
+    return parseFloat((allRates.reduce((a, b) => a + b, 0) / allRates.length).toFixed(4));
+}
+
 function updateChart(data, commentary) {
+    if (chartViewMode === "5yr") {
+        render5YrChart(data);
+    } else {
+        render2026Chart(data, commentary);
+    }
+}
+
+function render2026Chart(data, commentary) {
+    // Update Chart Card Header Titles
+    const mainTitleEl = document.getElementById('chart-main-title');
+    const subInfoEl = document.getElementById('chart-sub-info');
+    if (mainTitleEl) mainTitleEl.textContent = '환율 추이 및 전망 시각화 (Forecast Trend)';
+    if (subInfoEl) subInfoEl.textContent = '* 점선(Dashed)은 당월 말 및 4Q 예측선';
+
     const ctx = document.getElementById('rateTrendChart').getContext('2d');
     const records = data.records;
     const fmt = data.format;
@@ -1684,6 +1728,32 @@ function exportToCSV() {
 // Event Listeners
 refreshBtn.addEventListener('click', () => {
     loadRates(currentCurrency);
+
+    // Chart View Mode Toggle Event Listeners
+    const btnView2026 = document.getElementById('btn-view-2026');
+    const btnView5yr = document.getElementById('btn-view-5yr');
+    if (btnView2026 && btnView5yr) {
+        btnView2026.addEventListener('click', () => {
+            if (chartViewMode === '2026') return;
+            chartViewMode = '2026';
+            btnView2026.classList.add('active');
+            btnView5yr.classList.remove('active');
+            if (currentData) {
+                updateChart(currentData, currentData.commentary);
+            }
+        });
+
+        btnView5yr.addEventListener('click', () => {
+            if (chartViewMode === '5yr') return;
+            chartViewMode = '5yr';
+            btnView5yr.classList.add('active');
+            btnView2026.classList.remove('active');
+            if (currentData) {
+                updateChart(currentData, currentData.commentary);
+            }
+        });
+    }
+
 });
 
 exportCsvBtn.addEventListener('click', exportToCSV);
@@ -1769,6 +1839,32 @@ editorForm.addEventListener('submit', async (e) => {
     
     // Reload rates for display and chart refreshing
     loadRates(currentCurrency);
+
+    // Chart View Mode Toggle Event Listeners
+    const btnView2026 = document.getElementById('btn-view-2026');
+    const btnView5yr = document.getElementById('btn-view-5yr');
+    if (btnView2026 && btnView5yr) {
+        btnView2026.addEventListener('click', () => {
+            if (chartViewMode === '2026') return;
+            chartViewMode = '2026';
+            btnView2026.classList.add('active');
+            btnView5yr.classList.remove('active');
+            if (currentData) {
+                updateChart(currentData, currentData.commentary);
+            }
+        });
+
+        btnView5yr.addEventListener('click', () => {
+            if (chartViewMode === '5yr') return;
+            chartViewMode = '5yr';
+            btnView5yr.classList.add('active');
+            btnView2026.classList.remove('active');
+            if (currentData) {
+                updateChart(currentData, currentData.commentary);
+            }
+        });
+    }
+
     
     const statusMsg = serverSuccess 
         ? "분석 및 전망 데이터가 서버와 로컬에 모두 성공적으로 저장되었습니다." 
@@ -1918,6 +2014,32 @@ if (officialRateUploadBtn && officialRateModal) {
             await loadCurrencies();
             await loadRates(currentCurrency);
 
+    // Chart View Mode Toggle Event Listeners
+    const btnView2026 = document.getElementById('btn-view-2026');
+    const btnView5yr = document.getElementById('btn-view-5yr');
+    if (btnView2026 && btnView5yr) {
+        btnView2026.addEventListener('click', () => {
+            if (chartViewMode === '2026') return;
+            chartViewMode = '2026';
+            btnView2026.classList.add('active');
+            btnView5yr.classList.remove('active');
+            if (currentData) {
+                updateChart(currentData, currentData.commentary);
+            }
+        });
+
+        btnView5yr.addEventListener('click', () => {
+            if (chartViewMode === '5yr') return;
+            chartViewMode = '5yr';
+            btnView5yr.classList.add('active');
+            btnView2026.classList.remove('active');
+            if (currentData) {
+                updateChart(currentData, currentData.commentary);
+            }
+        });
+    }
+
+
         } catch (err) {
             alert(`저장 오류: ${err.message}`);
         } finally {
@@ -1948,6 +2070,32 @@ async function fetchPublicRates() {
             // Re-render UI with newly merged rates
             loadCurrencies();
             loadRates(currentCurrency);
+
+    // Chart View Mode Toggle Event Listeners
+    const btnView2026 = document.getElementById('btn-view-2026');
+    const btnView5yr = document.getElementById('btn-view-5yr');
+    if (btnView2026 && btnView5yr) {
+        btnView2026.addEventListener('click', () => {
+            if (chartViewMode === '2026') return;
+            chartViewMode = '2026';
+            btnView2026.classList.add('active');
+            btnView5yr.classList.remove('active');
+            if (currentData) {
+                updateChart(currentData, currentData.commentary);
+            }
+        });
+
+        btnView5yr.addEventListener('click', () => {
+            if (chartViewMode === '5yr') return;
+            chartViewMode = '5yr';
+            btnView5yr.classList.add('active');
+            btnView2026.classList.remove('active');
+            if (currentData) {
+                updateChart(currentData, currentData.commentary);
+            }
+        });
+    }
+
         }
     } catch (err) {
         console.error("Failed to fetch public rates from Frankfurter:", err);
@@ -2057,7 +2205,155 @@ document.addEventListener('DOMContentLoaded', () => {
     
     loadCurrencies();
     loadRates(currentCurrency);
+
+    // Chart View Mode Toggle Event Listeners
+    const btnView2026 = document.getElementById('btn-view-2026');
+    const btnView5yr = document.getElementById('btn-view-5yr');
+    if (btnView2026 && btnView5yr) {
+        btnView2026.addEventListener('click', () => {
+            if (chartViewMode === '2026') return;
+            chartViewMode = '2026';
+            btnView2026.classList.add('active');
+            btnView5yr.classList.remove('active');
+            if (currentData) {
+                updateChart(currentData, currentData.commentary);
+            }
+        });
+
+        btnView5yr.addEventListener('click', () => {
+            if (chartViewMode === '5yr') return;
+            chartViewMode = '5yr';
+            btnView5yr.classList.add('active');
+            btnView2026.classList.remove('active');
+            if (currentData) {
+                updateChart(currentData, currentData.commentary);
+            }
+        });
+    }
+
     
     // Asynchronously fetch live public rates to update simulated/missing dates
     fetchPublicRates();
 });
+
+
+function render5YrChart(data) {
+    const ctx = document.getElementById('rateTrendChart').getContext('2d');
+    const currency = data.currency;
+    const fmt = data.format;
+    const hist = HISTORICAL_5YR_RATES[currency] || {};
+    const ytdRate = calc2026YtdAverage(data) || data.cumulative_average;
+
+    const mainTitleEl = document.getElementById('chart-main-title');
+    const subInfoEl = document.getElementById('chart-sub-info');
+    if (mainTitleEl) mainTitleEl.textContent = `${data.name} 최근 5개년 연평균 추이`;
+    if (subInfoEl) subInfoEl.textContent = '* 2022~2025년은 확정 연평균, 2026년은 1~9월 연간 누적평균(YTD)';
+
+    const labels = ["2022년", "2023년", "2024년", "2025년", "2026년 (YTD)"];
+    const chartRates = [hist["2022"] || null, hist["2023"] || null, hist["2024"] || null, hist["2025"] || null, ytdRate];
+
+    if (trendChart) {
+        trendChart.destroy();
+    }
+
+    const formatValue = (val) => {
+        if (val === null || val === undefined) return "";
+        if (fmt && fmt.includes(".2f")) {
+            return val.toLocaleString('ko-KR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        } else if (fmt && fmt.includes(".4f")) {
+            return val.toLocaleString('ko-KR', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+        } else if (fmt && fmt.includes(".3f")) {
+            return val.toLocaleString('ko-KR', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+        } else if (fmt && fmt.includes(".0f")) {
+            return Math.round(val).toLocaleString('ko-KR');
+        }
+        return val.toString();
+    };
+
+    trendChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: '연평균 환율 (Annual Avg / YTD)',
+                    data: chartRates,
+                    borderColor: '#0d9488',
+                    backgroundColor: 'rgba(13, 148, 136, 0.08)',
+                    fill: true,
+                    borderWidth: 2.5,
+                    pointRadius: [6, 6, 6, 6, 9],
+                    pointHoverRadius: [8, 8, 8, 8, 11],
+                    pointBackgroundColor: ['#ffffff', '#ffffff', '#ffffff', '#ffffff', '#0d9488'],
+                    pointBorderColor: ['#0d9488', '#0d9488', '#0d9488', '#0d9488', '#ffffff'],
+                    pointBorderWidth: [2.5, 2.5, 2.5, 2.5, 3],
+                    tension: 0.25
+                }
+            ]
+        },
+        plugins: [
+            {
+                id: 'customDataLabels',
+                afterDatasetsDraw(chart) {
+                    const c = chart.ctx;
+                    const meta = chart.getDatasetMeta(0);
+                    meta.data.forEach((point, idx) => {
+                        const val = chartRates[idx];
+                        if (val === null || val === undefined) return;
+                        const text = formatValue(val);
+                        c.save();
+                        c.font = (idx === 4) ? 'bold 12px Inter, sans-serif' : '600 11px Inter, sans-serif';
+                        c.fillStyle = (idx === 4) ? '#0d9488' : '#334155';
+                        c.textAlign = 'center';
+                        c.textBaseline = 'bottom';
+                        c.fillText(text, point.x, point.y - 10);
+                        c.restore();
+                    });
+                }
+            }
+        ],
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        boxWidth: 15,
+                        font: { size: 11, family: 'Inter' }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const val = context.parsed.y;
+                            const isYtd = (context.dataIndex === 4);
+                            return `${context.dataset.label}: ${formatValue(val)} ${isYtd ? '(2026년 1~9월 YTD 누적)' : '(확정 연평균)'}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: {
+                        font: { size: 11, family: 'Inter', weight: '500' }
+                    }
+                },
+                y: {
+                    grid: { color: '#f1f3f4' },
+                    ticks: {
+                        font: { size: 10, family: 'Inter' },
+                        callback: function(value) {
+                            return formatValue(value);
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
