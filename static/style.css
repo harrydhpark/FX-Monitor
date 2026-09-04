@@ -949,3 +949,84 @@ body {
 .commentary-card:hover .commentary-card-footer {
     color: var(--text-primary) !important;
 }
+
+/* Monthly Forecast Card Styles */
+.monthly-forecast-card {
+    border-left: 3px solid #0d9488 !important;
+}
+
+.forecast-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 12px;
+}
+
+@media (max-width: 600px) {
+    .forecast-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.forecast-grid-item {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 10px;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.forecast-grid-item:hover {
+    background: #ffffff;
+    border-color: #cbd5e1;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.forecast-grid-item.highlight {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+}
+
+.fg-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 4px;
+}
+
+.forecast-grid-item.highlight .fg-title {
+    color: #15803d;
+}
+
+.fg-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: -0.3px;
+}
+
+.forecast-grid-item.highlight .fg-value {
+    color: #166534;
+}
+
+.fg-sub {
+    font-size: 10px;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+.fg-sub.up {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+.fg-sub.down {
+    color: #2563eb;
+    font-weight: 600;
+}
+
+.fg-sub.flat {
+    color: #64748b;
+}

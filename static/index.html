@@ -250,6 +250,43 @@
                             전망치 근거: <strong id="text-forecast-source" style="color: var(--text-primary);">-</strong>
                         </div>
                     </div>
+
+                    <!-- Monthly Forecast Card (10월, 11월, 12월, 4Q) -->
+                    <div class="commentary-card monthly-forecast-card" style="margin-top: 14px;">
+                        <div class="commentary-card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <span class="material-icons-outlined commentary-icon" style="color: #0d9488;">trending_up</span>
+                                <h3 style="color: #0f172a; font-size: 15px;">9월 이후 월별 전망 요약</h3>
+                            </div>
+                            <span class="badge-source" id="badge-forecast-agency" style="font-size: 11px; background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 4px; font-weight: 600;">Bloomberg/IB</span>
+                        </div>
+                        <div class="forecast-grid" id="forecast-grid">
+                            <div class="forecast-grid-item">
+                                <div class="fg-title">10월 전망</div>
+                                <div class="fg-value" id="fg-m10">-</div>
+                                <div class="fg-sub" id="fg-m10-change">-</div>
+                            </div>
+                            <div class="forecast-grid-item">
+                                <div class="fg-title">11월 전망</div>
+                                <div class="fg-value" id="fg-m11">-</div>
+                                <div class="fg-sub" id="fg-m11-change">-</div>
+                            </div>
+                            <div class="forecast-grid-item">
+                                <div class="fg-title">12월 전망</div>
+                                <div class="fg-value" id="fg-m12">-</div>
+                                <div class="fg-sub" id="fg-m12-change">-</div>
+                            </div>
+                            <div class="forecast-grid-item highlight">
+                                <div class="fg-title">4Q 평균</div>
+                                <div class="fg-value text-bold" id="fg-q4">-</div>
+                                <div class="fg-sub" id="fg-q4-change">-</div>
+                            </div>
+                        </div>
+                        <div class="commentary-card-footer" style="margin-top: 10px; font-size: 11px; color: var(--text-secondary); display: flex; justify-content: space-between;">
+                            <span>9월말 예상: <strong id="fg-sep-end" style="color: var(--text-primary);">-</strong></span>
+                            <span>3Q 실적+전망 평균: <strong id="fg-q3-avg" style="color: var(--text-primary);">-</strong></span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -289,6 +326,6 @@
         </main>
     </div>
     
-    <script src="app.js?v=2.1.0"></script>
+    <script src="app.js?v=2.2.0"></script>
 </body>
 </html>
