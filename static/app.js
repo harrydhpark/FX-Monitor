@@ -1,4 +1,4 @@
-const FX_APP_VERSION = '2.3.0';
+const FX_APP_VERSION = '2.4.0';
 
 function checkAndMigrateStorage() {
     try {
@@ -1728,6 +1728,7 @@ function exportToCSV() {
 // Event Listeners
 refreshBtn.addEventListener('click', () => {
     loadRates(currentCurrency);
+}
 
     // Chart View Mode Toggle Event Listeners
     const btnView2026 = document.getElementById('btn-view-2026');
@@ -1766,8 +1767,9 @@ closeAiAnswer.addEventListener('click', () => {
     aiSearchInput.value = '';
 });
 
-// Commentary Editor Events
-editCommentaryBtn.addEventListener('click', () => {
+// Commentary Editor Events (Guarded)
+if (editCommentaryBtn) {
+    editCommentaryBtn.addEventListener('click', () => {
     if (!currentData) return;
     
     const commentary = currentData.commentary || {};
@@ -1790,10 +1792,10 @@ function hideEditor() {
     editorForm.reset();
 }
 
-closeEditorBtn.addEventListener('click', hideEditor);
-cancelEditBtn.addEventListener('click', hideEditor);
+if (closeEditorBtn) closeEditorBtn.addEventListener('click', hideEditor);
+if (cancelEditBtn) cancelEditBtn.addEventListener('click', hideEditor);
 
-editorForm.addEventListener('submit', async (e) => {
+if (editorForm) editorForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const payload = {
@@ -1839,6 +1841,7 @@ editorForm.addEventListener('submit', async (e) => {
     
     // Reload rates for display and chart refreshing
     loadRates(currentCurrency);
+}
 
     // Chart View Mode Toggle Event Listeners
     const btnView2026 = document.getElementById('btn-view-2026');
@@ -1874,23 +1877,23 @@ editorForm.addEventListener('submit', async (e) => {
 
 // Official Rates Ingestion Modal Events
 if (officialRateUploadBtn && officialRateModal) {
-    officialRateUploadBtn.addEventListener('click', () => {
+    if (officialRateUploadBtn) officialRateUploadBtn.addEventListener('click', () => {
         officialRateModal.classList.remove('hidden');
         officialRateModal.scrollIntoView({ behavior: 'smooth', block: 'start' });
         inputOfficialPaste.focus();
     });
 
-    closeOfficialModalBtn.addEventListener('click', () => {
+    if (closeOfficialModalBtn) closeOfficialModalBtn.addEventListener('click', () => {
         officialRateModal.classList.add('hidden');
         officialPreviewContainer.classList.add('hidden');
     });
 
-    btnCancelPreview.addEventListener('click', () => {
+    if (btnCancelPreview) btnCancelPreview.addEventListener('click', () => {
         officialRateModal.classList.add('hidden');
         officialPreviewContainer.classList.add('hidden');
     });
 
-    btnParsePreview.addEventListener('click', async () => {
+    if (btnParsePreview) btnParsePreview.addEventListener('click', async () => {
         const text = inputOfficialPaste.value.trim();
         if (!text) {
             alert('사내 환율 공지 표 텍스트를 먼저 붙여넣어 주세요.');
@@ -1979,7 +1982,7 @@ if (officialRateUploadBtn && officialRateModal) {
         }
     });
 
-    btnConfirmSaveOfficial.addEventListener('click', async () => {
+    if (btnConfirmSaveOfficial) btnConfirmSaveOfficial.addEventListener('click', async () => {
         if (!lastParsedData) return;
 
         if (!confirm('파싱된 공식 환율 실적 데이터를 확정 저장하시겠습니까? 대시보드 데이터가 즉시 갱신됩니다.')) {
@@ -2070,6 +2073,7 @@ async function fetchPublicRates() {
             // Re-render UI with newly merged rates
             loadCurrencies();
             loadRates(currentCurrency);
+}
 
     // Chart View Mode Toggle Event Listeners
     const btnView2026 = document.getElementById('btn-view-2026');
@@ -2205,6 +2209,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     loadCurrencies();
     loadRates(currentCurrency);
+}
 
     // Chart View Mode Toggle Event Listeners
     const btnView2026 = document.getElementById('btn-view-2026');
