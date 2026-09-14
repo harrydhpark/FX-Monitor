@@ -34,9 +34,69 @@
         "date": "2026-09-04",
         "type": "daily",
         "rate": 1.162
+      },
+      {
+        "label": "2026-09-05",
+        "date": "2026-09-05",
+        "type": "daily",
+        "rate": 1.162
+      },
+      {
+        "label": "2026-09-06",
+        "date": "2026-09-06",
+        "type": "daily",
+        "rate": 1.162
+      },
+      {
+        "label": "2026-09-07",
+        "date": "2026-09-07",
+        "type": "daily",
+        "rate": 1.161
+      },
+      {
+        "label": "2026-09-08",
+        "date": "2026-09-08",
+        "type": "daily",
+        "rate": 1.163
+      },
+      {
+        "label": "2026-09-09",
+        "date": "2026-09-09",
+        "type": "daily",
+        "rate": 1.163
+      },
+      {
+        "label": "2026-09-10",
+        "date": "2026-09-10",
+        "type": "daily",
+        "rate": 1.164
+      },
+      {
+        "label": "2026-09-11",
+        "date": "2026-09-11",
+        "type": "daily",
+        "rate": 1.161
+      },
+      {
+        "label": "2026-09-12",
+        "date": "2026-09-12",
+        "type": "daily",
+        "rate": 1.161
+      },
+      {
+        "label": "2026-09-13",
+        "date": "2026-09-13",
+        "type": "daily",
+        "rate": 1.161
+      },
+      {
+        "label": "2026-09-14",
+        "date": "2026-09-14",
+        "type": "daily",
+        "rate": 1.159
       }
     ],
-    "cumulative_average": 1.16
+    "cumulative_average": 1.161
   },
   "GBP": {
     "monthly_averages": {
@@ -73,6 +133,66 @@
         "date": "2026-09-04",
         "type": "daily",
         "rate": 1.353
+      },
+      {
+        "label": "2026-09-05",
+        "date": "2026-09-05",
+        "type": "daily",
+        "rate": 1.353
+      },
+      {
+        "label": "2026-09-06",
+        "date": "2026-09-06",
+        "type": "daily",
+        "rate": 1.353
+      },
+      {
+        "label": "2026-09-07",
+        "date": "2026-09-07",
+        "type": "daily",
+        "rate": 1.352
+      },
+      {
+        "label": "2026-09-08",
+        "date": "2026-09-08",
+        "type": "daily",
+        "rate": 1.354
+      },
+      {
+        "label": "2026-09-09",
+        "date": "2026-09-09",
+        "type": "daily",
+        "rate": 1.354
+      },
+      {
+        "label": "2026-09-10",
+        "date": "2026-09-10",
+        "type": "daily",
+        "rate": 1.355
+      },
+      {
+        "label": "2026-09-11",
+        "date": "2026-09-11",
+        "type": "daily",
+        "rate": 1.351
+      },
+      {
+        "label": "2026-09-12",
+        "date": "2026-09-12",
+        "type": "daily",
+        "rate": 1.351
+      },
+      {
+        "label": "2026-09-13",
+        "date": "2026-09-13",
+        "type": "daily",
+        "rate": 1.351
+      },
+      {
+        "label": "2026-09-14",
+        "date": "2026-09-14",
+        "type": "daily",
+        "rate": 1.352
       }
     ],
     "cumulative_average": 1.352
@@ -112,9 +232,69 @@
         "date": "2026-09-04",
         "type": "daily",
         "rate": 20.8
+      },
+      {
+        "label": "2026-09-05",
+        "date": "2026-09-05",
+        "type": "daily",
+        "rate": 20.8
+      },
+      {
+        "label": "2026-09-06",
+        "date": "2026-09-06",
+        "type": "daily",
+        "rate": 20.8
+      },
+      {
+        "label": "2026-09-07",
+        "date": "2026-09-07",
+        "type": "daily",
+        "rate": 20.83
+      },
+      {
+        "label": "2026-09-08",
+        "date": "2026-09-08",
+        "type": "daily",
+        "rate": 20.81
+      },
+      {
+        "label": "2026-09-09",
+        "date": "2026-09-09",
+        "type": "daily",
+        "rate": 20.81
+      },
+      {
+        "label": "2026-09-10",
+        "date": "2026-09-10",
+        "type": "daily",
+        "rate": 20.84
+      },
+      {
+        "label": "2026-09-11",
+        "date": "2026-09-11",
+        "type": "daily",
+        "rate": 20.89
+      },
+      {
+        "label": "2026-09-12",
+        "date": "2026-09-12",
+        "type": "daily",
+        "rate": 20.89
+      },
+      {
+        "label": "2026-09-13",
+        "date": "2026-09-13",
+        "type": "daily",
+        "rate": 20.89
+      },
+      {
+        "label": "2026-09-14",
+        "date": "2026-09-14",
+        "type": "daily",
+        "rate": 20.9
       }
     ],
-    "cumulative_average": 20.83
+    "cumulative_average": 20.84
   },
   "HUF": {
     "monthly_averages": {
@@ -151,9 +331,69 @@
         "date": "2026-09-04",
         "type": "daily",
         "rate": 311.53
+      },
+      {
+        "label": "2026-09-05",
+        "date": "2026-09-05",
+        "type": "daily",
+        "rate": 311.53
+      },
+      {
+        "label": "2026-09-06",
+        "date": "2026-09-06",
+        "type": "daily",
+        "rate": 311.53
+      },
+      {
+        "label": "2026-09-07",
+        "date": "2026-09-07",
+        "type": "daily",
+        "rate": 312.5
+      },
+      {
+        "label": "2026-09-08",
+        "date": "2026-09-08",
+        "type": "daily",
+        "rate": 312.5
+      },
+      {
+        "label": "2026-09-09",
+        "date": "2026-09-09",
+        "type": "daily",
+        "rate": 312.5
+      },
+      {
+        "label": "2026-09-10",
+        "date": "2026-09-10",
+        "type": "daily",
+        "rate": 312.5
+      },
+      {
+        "label": "2026-09-11",
+        "date": "2026-09-11",
+        "type": "daily",
+        "rate": 314.47
+      },
+      {
+        "label": "2026-09-12",
+        "date": "2026-09-12",
+        "type": "daily",
+        "rate": 314.47
+      },
+      {
+        "label": "2026-09-13",
+        "date": "2026-09-13",
+        "type": "daily",
+        "rate": 314.47
+      },
+      {
+        "label": "2026-09-14",
+        "date": "2026-09-14",
+        "type": "daily",
+        "rate": 313.48
       }
     ],
-    "cumulative_average": 315.23
+    "cumulative_average": 313.63
   },
   "PLN": {
     "monthly_averages": {
@@ -190,9 +430,69 @@
         "date": "2026-09-04",
         "type": "daily",
         "rate": 3.72
+      },
+      {
+        "label": "2026-09-05",
+        "date": "2026-09-05",
+        "type": "daily",
+        "rate": 3.72
+      },
+      {
+        "label": "2026-09-06",
+        "date": "2026-09-06",
+        "type": "daily",
+        "rate": 3.72
+      },
+      {
+        "label": "2026-09-07",
+        "date": "2026-09-07",
+        "type": "daily",
+        "rate": 3.71
+      },
+      {
+        "label": "2026-09-08",
+        "date": "2026-09-08",
+        "type": "daily",
+        "rate": 3.71
+      },
+      {
+        "label": "2026-09-09",
+        "date": "2026-09-09",
+        "type": "daily",
+        "rate": 3.71
+      },
+      {
+        "label": "2026-09-10",
+        "date": "2026-09-10",
+        "type": "daily",
+        "rate": 3.71
+      },
+      {
+        "label": "2026-09-11",
+        "date": "2026-09-11",
+        "type": "daily",
+        "rate": 3.73
+      },
+      {
+        "label": "2026-09-12",
+        "date": "2026-09-12",
+        "type": "daily",
+        "rate": 3.73
+      },
+      {
+        "label": "2026-09-13",
+        "date": "2026-09-13",
+        "type": "daily",
+        "rate": 3.73
+      },
+      {
+        "label": "2026-09-14",
+        "date": "2026-09-14",
+        "type": "daily",
+        "rate": 3.73
       }
     ],
-    "cumulative_average": 3.73
+    "cumulative_average": 3.72
   },
   "RON": {
     "monthly_averages": {
@@ -229,9 +529,69 @@
         "date": "2026-09-04",
         "type": "daily",
         "rate": 4.52
+      },
+      {
+        "label": "2026-09-05",
+        "date": "2026-09-05",
+        "type": "daily",
+        "rate": 4.52
+      },
+      {
+        "label": "2026-09-06",
+        "date": "2026-09-06",
+        "type": "daily",
+        "rate": 4.52
+      },
+      {
+        "label": "2026-09-07",
+        "date": "2026-09-07",
+        "type": "daily",
+        "rate": 4.52
+      },
+      {
+        "label": "2026-09-08",
+        "date": "2026-09-08",
+        "type": "daily",
+        "rate": 4.52
+      },
+      {
+        "label": "2026-09-09",
+        "date": "2026-09-09",
+        "type": "daily",
+        "rate": 4.52
+      },
+      {
+        "label": "2026-09-10",
+        "date": "2026-09-10",
+        "type": "daily",
+        "rate": 4.51
+      },
+      {
+        "label": "2026-09-11",
+        "date": "2026-09-11",
+        "type": "daily",
+        "rate": 4.52
+      },
+      {
+        "label": "2026-09-12",
+        "date": "2026-09-12",
+        "type": "daily",
+        "rate": 4.52
+      },
+      {
+        "label": "2026-09-13",
+        "date": "2026-09-13",
+        "type": "daily",
+        "rate": 4.52
+      },
+      {
+        "label": "2026-09-14",
+        "date": "2026-09-14",
+        "type": "daily",
+        "rate": 4.53
       }
     ],
-    "cumulative_average": 4.53
+    "cumulative_average": 4.52
   },
   "CHF": {
     "monthly_averages": {
@@ -268,9 +628,69 @@
         "date": "2026-09-04",
         "type": "daily",
         "rate": 1.238
+      },
+      {
+        "label": "2026-09-05",
+        "date": "2026-09-05",
+        "type": "daily",
+        "rate": 1.238
+      },
+      {
+        "label": "2026-09-06",
+        "date": "2026-09-06",
+        "type": "daily",
+        "rate": 1.238
+      },
+      {
+        "label": "2026-09-07",
+        "date": "2026-09-07",
+        "type": "daily",
+        "rate": 1.235
+      },
+      {
+        "label": "2026-09-08",
+        "date": "2026-09-08",
+        "type": "daily",
+        "rate": 1.236
+      },
+      {
+        "label": "2026-09-09",
+        "date": "2026-09-09",
+        "type": "daily",
+        "rate": 1.236
+      },
+      {
+        "label": "2026-09-10",
+        "date": "2026-09-10",
+        "type": "daily",
+        "rate": 1.235
+      },
+      {
+        "label": "2026-09-11",
+        "date": "2026-09-11",
+        "type": "daily",
+        "rate": 1.23
+      },
+      {
+        "label": "2026-09-12",
+        "date": "2026-09-12",
+        "type": "daily",
+        "rate": 1.23
+      },
+      {
+        "label": "2026-09-13",
+        "date": "2026-09-13",
+        "type": "daily",
+        "rate": 1.23
+      },
+      {
+        "label": "2026-09-14",
+        "date": "2026-09-14",
+        "type": "daily",
+        "rate": 1.224
       }
     ],
-    "cumulative_average": 1.234
+    "cumulative_average": 1.233
   },
   "KRW": {
     "monthly_averages": {
@@ -307,8 +727,68 @@
         "date": "2026-09-04",
         "type": "daily",
         "rate": 1360
+      },
+      {
+        "label": "2026-09-05",
+        "date": "2026-09-05",
+        "type": "daily",
+        "rate": 1360
+      },
+      {
+        "label": "2026-09-06",
+        "date": "2026-09-06",
+        "type": "daily",
+        "rate": 1360
+      },
+      {
+        "label": "2026-09-07",
+        "date": "2026-09-07",
+        "type": "daily",
+        "rate": 1355
+      },
+      {
+        "label": "2026-09-08",
+        "date": "2026-09-08",
+        "type": "daily",
+        "rate": 1343
+      },
+      {
+        "label": "2026-09-09",
+        "date": "2026-09-09",
+        "type": "daily",
+        "rate": 1341
+      },
+      {
+        "label": "2026-09-10",
+        "date": "2026-09-10",
+        "type": "daily",
+        "rate": 1338
+      },
+      {
+        "label": "2026-09-11",
+        "date": "2026-09-11",
+        "type": "daily",
+        "rate": 1338
+      },
+      {
+        "label": "2026-09-12",
+        "date": "2026-09-12",
+        "type": "daily",
+        "rate": 1338
+      },
+      {
+        "label": "2026-09-13",
+        "date": "2026-09-13",
+        "type": "daily",
+        "rate": 1338
+      },
+      {
+        "label": "2026-09-14",
+        "date": "2026-09-14",
+        "type": "daily",
+        "rate": 1346
       }
     ],
-    "cumulative_average": 1368
+    "cumulative_average": 1352
   }
 }

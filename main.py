@@ -57,8 +57,8 @@ COMMENTARIES_FILE = os.path.join(DATA_DIR, "commentaries.json")
 DATA_CACHE = {}
 CACHE_EXPIRATION_MINUTES = int(os.environ.get("CACHE_EXPIRE_MINUTES", 60))
 
-# Current Local Time Simulation: 2026-09-04 (Friday)
-CURRENT_DATE = datetime(2026, 9, 4)
+# Current Local Time Simulation: 2026-09-14 (Monday)
+CURRENT_DATE = datetime(2026, 9, 14)
 
 def generate_mock_data(currency: str) -> dict:
     """Delegates mock data generation to exchange_service."""
